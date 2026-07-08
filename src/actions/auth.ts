@@ -36,6 +36,7 @@ export async function signup(input: {
   goal: FitnessGoal
 }) {
   const supabase = await createClient()
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://traintools.es'
 
   const { data, error } = await supabase.auth.signUp({
     email: input.email,
@@ -45,6 +46,7 @@ export async function signup(input: {
         full_name: input.name,
         goal: input.goal,
       },
+      emailRedirectTo: `${siteUrl}/callback`,
     },
   })
 
