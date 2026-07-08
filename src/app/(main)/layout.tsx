@@ -46,12 +46,10 @@ export default async function MainLayout({ children }: { children: React.ReactNo
         <div className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#080C14]/88 px-4 py-3 backdrop-blur-xl lg:px-6">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0 md:hidden">
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-[#FF6A00]">Panel coach</p>
-              <p className="truncate text-[11px] text-[#94A3B8]">Clientes y programas</p>
+              <p className="truncate text-sm font-bold text-white">Clientes y programas</p>
             </div>
             <div className="hidden min-w-0 md:block">
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-[#FF6A00]">Panel coach</p>
-              <p className="truncate text-[11px] text-[#94A3B8]">Clientes, planes y operaciones del negocio.</p>
+              <p className="truncate text-sm font-bold text-white">Clientes, planes y operaciones del negocio.</p>
             </div>
             <WorkspaceActions mode="admin" userName={userName} userEmail={userEmail} settingsHref="/dashboard/settings" />
           </div>

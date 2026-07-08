@@ -93,13 +93,6 @@ export function Sidebar({
         <BrandMark />
       </div>
 
-      <div className="border-b border-white/[0.06] px-3 py-3">
-        <div className="rounded-2xl border border-[#FF6A00]/25 bg-[#FF6A00]/10 px-3 py-2">
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-[#FF6A00]">Panel coach</p>
-          <p className="mt-0.5 text-[11px] leading-relaxed text-[#94A3B8]">Gestión de clientes y programas</p>
-        </div>
-      </div>
-
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         <div className="space-y-0.5">
