@@ -1,0 +1,13 @@
+node_modules
+.next
+.git
+.env
+.env.local
+.env.*.local
+*.log
+.vscode
+.idea
+.claude
+.playwright-mcp
+supabase/.branches
+supabase/.temp
