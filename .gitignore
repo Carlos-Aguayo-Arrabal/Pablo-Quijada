@@ -8,11 +8,13 @@ pnpm-lock.yaml
 
 # Testing
 /coverage
+/.playwright-mcp/
 
 # Next.js
 /.next/
 /out/
 *.rsc
+tsconfig.tsbuildinfo
 
 # Production
 /build
@@ -32,6 +34,17 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+dev-server.*.log
+localtunnel.*.log
+
+# Local QA screenshots
+/auth-login-*.png
+/checkins-*.png
+/client-detail.png
+/dashboard-*.png
+/messages-*.png
+/profile-*.png
+/workouts-*.png
 
 # Local env files
 .env*.local
@@ -55,6 +68,7 @@ Thumbs.db
 .LSOverride
 
 # Claude Code
+.claude/settings.json
 .claude/skills/**/node_modules
 .claude/plugins
 *.mcp.json

@@ -1,10 +1,21 @@
+import type { Metadata } from 'next'
+import { SignupForm } from '@/features/auth/components/signup-form'
+
+export const metadata: Metadata = {
+  title: 'Crear cuenta',
+  description: 'Crea tu cuenta TrainTools y empieza a gestionar tu negocio de coaching.',
+}
+
 export default function SignupPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="w-full max-w-md space-y-8 p-8">
-        <h1 className="text-3xl font-bold">Sign Up</h1>
-        <p className="text-gray-600">Implementa SignupForm desde features/auth/components/</p>
+    <div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-white">Prueba TrainTools gratis</h1>
+        <p className="mt-1.5 text-sm text-[#94A3B8]">
+          Crea tu espacio profesional y empieza con tus primeros clientes
+        </p>
       </div>
+      <SignupForm />
     </div>
   )
 }

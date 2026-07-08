@@ -1,9 +1,31 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'SaaS Factory App',
-  description: 'Built with SaaS Factory',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://traintools.es'),
+  title: {
+    default: 'TrainTools — Gestiona tu negocio fitness',
+    template: '%s | TrainTools',
+  },
+  description: 'Plataforma para entrenadores, nutricionistas y centros wellness: clientes, planes, pagos, citas y seguimiento en un solo lugar.',
+  keywords: ['software entrenadores', 'coaching fitness', 'nutricionistas', 'clientes', 'rutinas', 'pagos recurrentes'],
+  authors: [{ name: 'TrainTools' }],
+  openGraph: {
+    type: 'website',
+    locale: 'es_ES',
+    siteName: 'TrainTools',
+    title: 'TrainTools — Gestiona tu negocio fitness',
+    description: 'Centraliza clientes, rutinas, nutricion, citas, comunicacion y pagos para escalar tu servicio de coaching.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({
@@ -12,8 +34,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="es" className="dark">
+      <body className="antialiased">
+        {children}
+      </body>
     </html>
   )
 }
