@@ -13,16 +13,20 @@ import {
   X,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
+import { markAllNotificationsRead, markNotificationRead, sendTestNotification, type NotificationItem } from '@/features/notifications/services/actions'
+import { usePushSubscription } from '@/features/notifications/hooks/use-push-subscription'
 
 type WorkspaceMode = 'admin' | 'client'
 type ActivePanel = 'help' | 'notifications' | 'settings' | null
 
 interface WorkspaceActionsProps {
   mode: WorkspaceMode
+  userId?: string
   userName?: string
   userEmail?: string
   settingsHref?: string
   compact?: boolean
+  notifications?: NotificationItem[]
 }
 
 const modeCopy = {
@@ -55,19 +59,31 @@ const notificationSeeds = {
 
 export function WorkspaceActions({
   mode,
+  userId,
   userName = mode === 'admin' ? 'Coach' : 'Cliente',
   userEmail,
   settingsHref,
   compact = false,
+  notifications: realNotifications,
 }: WorkspaceActionsProps) {
   const [activePanel, setActivePanel] = useState<ActivePanel>(null)
   const [readIds, setReadIds] = useState<Set<string>>(new Set())
   const [saved, setSaved] = useState(false)
+  const [testStatus, setTestStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [testError, setTestError] = useState<string | null>(null)
+  const push = usePushSubscription(userId)
   const copy = modeCopy[mode]
   const ModeIcon = copy.icon
-  const notifications = notificationSeeds[mode]
+  const usingRealData = realNotifications !== undefined
+  const notifications = useMemo(
+    () =>
+      realNotifications
+        ? realNotifications.map((item) => ({ id: item.id, title: item.title, detail: item.detail, seededRead: item.read }))
+        : notificationSeeds[mode].map((item) => ({ ...item, seededRead: false })),
+    [realNotifications, mode]
+  )
   const unreadCount = useMemo(
-    () => notifications.filter((item) => !readIds.has(item.id)).length,
+    () => notifications.filter((item) => !item.seededRead && !readIds.has(item.id)).length,
     [notifications, readIds]
   )
 
@@ -77,6 +93,12 @@ export function WorkspaceActions({
 
   function markAllRead() {
     setReadIds(new Set(notifications.map((item) => item.id)))
+    if (usingRealData) void markAllNotificationsRead()
+  }
+
+  function markOneRead(id: string) {
+    setReadIds((current) => new Set(current).add(id))
+    if (usingRealData) void markNotificationRead(id)
   }
 
   return (
@@ -155,12 +177,12 @@ export function WorkspaceActions({
               </div>
               <div className="space-y-2">
                 {notifications.map((item) => {
-                  const isRead = readIds.has(item.id)
+                  const isRead = item.seededRead || readIds.has(item.id)
                   return (
                     <button
                       key={item.id}
                       type="button"
-                      onClick={() => setReadIds((current) => new Set(current).add(item.id))}
+                      onClick={() => markOneRead(item.id)}
                       className="flex w-full gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] p-3 text-left transition hover:bg-white/[0.06]"
                     >
                       <span className={cn('mt-1 h-2.5 w-2.5 shrink-0 rounded-full', isRead ? 'bg-[#475569]' : 'bg-[#FF6A00]')} />
@@ -171,16 +193,63 @@ export function WorkspaceActions({
                     </button>
                   )
                 })}
+                {notifications.length === 0 && (
+                  <p className="px-1 py-2 text-sm text-[#94A3B8]">No tienes notificaciones todavía.</p>
+                )}
               </div>
             </div>
           )}
 
           {activePanel === 'settings' && (
             <div className="space-y-3 p-4">
-              <label className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-sm text-white">
-                Alertas push
-                <input type="checkbox" defaultChecked className="h-4 w-4 accent-[#FF6A00]" onChange={() => setSaved(false)} />
-              </label>
+              {usingRealData && push.isSupported ? (
+                <label className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-sm text-white">
+                  Alertas push
+                  <input
+                    type="checkbox"
+                    checked={push.isSubscribed}
+                    disabled={push.loading}
+                    className="h-4 w-4 accent-[#FF6A00]"
+                    onChange={(event) => (event.target.checked ? push.subscribe() : push.unsubscribe())}
+                  />
+                </label>
+              ) : (
+                <label className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-sm text-white">
+                  Alertas push
+                  <input type="checkbox" defaultChecked className="h-4 w-4 accent-[#FF6A00]" onChange={() => setSaved(false)} />
+                </label>
+              )}
+              {usingRealData && push.isSupported && push.isSubscribed && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setTestStatus('sending')
+                    setTestError(null)
+                    const result = await sendTestNotification()
+                    if (result.error) {
+                      setTestStatus('error')
+                      setTestError(result.error)
+                      return
+                    }
+                    setTestStatus('sent')
+                  }}
+                  disabled={testStatus === 'sending'}
+                  className="btn-secondary w-full justify-center px-4 py-2 text-xs disabled:opacity-60"
+                >
+                  <Bell className="h-4 w-4" />
+                  {testStatus === 'sending' ? 'Enviando...' : 'Enviar notificación de prueba'}
+                </button>
+              )}
+              {testStatus === 'sent' && (
+                <p className="rounded-xl border border-[#FF6A00]/25 bg-[#FF6A00]/10 px-3 py-2 text-xs text-[#FF6A00]">
+                  Enviada. Debería llegarte al móvil en unos segundos.
+                </p>
+              )}
+              {testStatus === 'error' && testError && (
+                <p className="rounded-xl border border-[#F87171]/30 bg-[#F87171]/10 px-3 py-2 text-xs text-[#F87171]">
+                  {testError}
+                </p>
+              )}
               <label className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-sm text-white">
                 Resumen diario
                 <input type="checkbox" defaultChecked={mode === 'admin'} className="h-4 w-4 accent-[#FF6A00]" onChange={() => setSaved(false)} />

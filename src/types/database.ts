@@ -198,6 +198,32 @@ export type BloqueEjercicio = {
   actualizado_en: string
 }
 
+export type SuscripcionPush = {
+  id: string
+  usuario_id: string | null
+  endpoint: string
+  p256dh: string
+  auth_key: string
+  dispositivo: string | null
+  navegador: string | null
+  user_agent: string | null
+  creado_en: string
+  usado_en: string
+}
+
+export type NotificacionTipo = string
+
+export type Notificacion = {
+  id: string
+  usuario_id: string
+  tipo: NotificacionTipo
+  titulo: string
+  cuerpo: string | null
+  datos: Json
+  leido: boolean
+  creado_en: string
+}
+
 export type Program = Programa
 export type Phase = FasePrograma
 export type Week = SemanaPrograma
@@ -374,6 +400,20 @@ export interface Database {
             referencedColumns: ['id']
           },
         ]
+      }
+      suscripciones_push: {
+        Row: SuscripcionPush
+        Insert: Pick<SuscripcionPush, 'endpoint' | 'p256dh' | 'auth_key'> &
+          Partial<Omit<SuscripcionPush, 'id' | 'endpoint' | 'p256dh' | 'auth_key' | 'creado_en'>>
+        Update: Partial<Omit<SuscripcionPush, 'id' | 'creado_en'>>
+        Relationships: []
+      }
+      notificaciones: {
+        Row: Notificacion
+        Insert: Pick<Notificacion, 'usuario_id' | 'tipo' | 'titulo'> &
+          Partial<Omit<Notificacion, 'id' | 'usuario_id' | 'tipo' | 'titulo' | 'creado_en'>>
+        Update: Partial<Omit<Notificacion, 'id' | 'creado_en'>>
+        Relationships: []
       }
     }
     Views: Record<string, never>

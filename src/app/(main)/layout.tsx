@@ -1,5 +1,8 @@
 import { Sidebar } from '@/shared/components/sidebar'
 import { WorkspaceActions } from '@/shared/components/workspace-actions'
+import { PWARegister } from '@/shared/components/pwa-register'
+import { PushNotificationPrompt } from '@/features/notifications/components/push-notification-prompt'
+import { listNotifications } from '@/features/notifications/services/actions'
 import { createClient } from '@/lib/supabase/server'
 import { DEMO_USER } from '@/features/demo/auth'
 import { isDemoSession } from '@/features/demo/server'
@@ -21,6 +24,8 @@ export default async function MainLayout({ children }: { children: React.ReactNo
     userName = profile?.full_name || user.email?.split('@')[0] || 'Coach'
     userEmail = user.email ?? ''
   }
+
+  const notifications = user && !demoSession ? await listNotifications() : undefined
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#080C14]">
@@ -51,7 +56,14 @@ export default async function MainLayout({ children }: { children: React.ReactNo
             <div className="hidden min-w-0 md:block">
               <p className="truncate text-sm font-bold text-white">Clientes, planes y operaciones del negocio.</p>
             </div>
-            <WorkspaceActions mode="admin" userName={userName} userEmail={userEmail} settingsHref="/dashboard/settings" />
+            <WorkspaceActions
+              mode="admin"
+              userId={user && !demoSession ? user.id : undefined}
+              userName={userName}
+              userEmail={userEmail}
+              settingsHref="/dashboard/settings"
+              notifications={notifications}
+            />
           </div>
         </div>
 
@@ -59,6 +71,9 @@ export default async function MainLayout({ children }: { children: React.ReactNo
           {children}
         </div>
       </main>
+
+      <PWARegister />
+      {user && !demoSession && <PushNotificationPrompt userId={user.id} />}
     </div>
   )
 }
