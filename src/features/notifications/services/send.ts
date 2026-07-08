@@ -1,5 +1,5 @@
 import webpush from 'web-push'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 
 let vapidConfigured = false
 function ensureVapid() {
@@ -22,6 +22,7 @@ interface SendPushInput {
 
 export async function sendPushNotification({ userId, title, body, url, type = 'general' }: SendPushInput) {
   ensureVapid()
+  const supabaseAdmin = getSupabaseAdmin()
 
   await supabaseAdmin.from('notificaciones').insert({
     usuario_id: userId,
