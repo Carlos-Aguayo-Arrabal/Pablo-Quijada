@@ -1,6 +1,7 @@
 'use client'
 
-import { Activity } from 'lucide-react'
+import { Activity, LogOut } from 'lucide-react'
+import { signout } from '@/actions/auth'
 import { WorkspaceActions } from '@/shared/components/workspace-actions'
 import { ClientDemoBanner } from '@/features/client/components/client-demo-banner'
 import { TodayWorkoutPanel } from '@/features/client/components/today-workout-panel'
@@ -42,6 +43,15 @@ export function ClientPortalView({ profile, plan, initialMessages, isDemo }: Cli
             <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#FF6A00]/30 to-[#FFB000]/30 text-sm font-bold sm:flex">
               {initialsFor(profile.nombre)}
             </div>
+            <button
+              type="button"
+              onClick={() => signout()}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/[0.08] text-[#94A3B8] hover:text-white"
+              aria-label="Cerrar sesión"
+              title="Cerrar sesión"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
           </div>
         </div>
       </header>
