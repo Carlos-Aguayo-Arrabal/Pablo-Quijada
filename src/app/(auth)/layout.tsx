@@ -6,7 +6,21 @@ import { BrandMark } from '@/shared/components/brand-mark'
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <GradientBackground className="min-h-screen">
-      <div className="flex min-h-screen items-center justify-center px-6 py-8 sm:px-8 lg:px-12">
+      <div className="flex items-center justify-end gap-2 px-6 py-4 sm:px-8 lg:px-12">
+        <Link
+          href="/login"
+          className="rounded-full px-4 py-2 text-sm font-medium text-[#94A3B8] hover:text-white"
+        >
+          Iniciar sesión
+        </Link>
+        <Link
+          href="/signup"
+          className="btn-primary px-4 py-2 text-sm"
+        >
+          Crear cuenta gratis
+        </Link>
+      </div>
+      <div className="flex min-h-[calc(100vh-64px)] items-center justify-center px-6 pb-8 sm:px-8 lg:px-12">
         <div className="grid w-full max-w-6xl gap-8 lg:grid-cols-[0.88fr_1fr] lg:items-center">
           <aside className="hidden lg:block">
             <Link href="/" className="mb-12 flex w-fit group">
