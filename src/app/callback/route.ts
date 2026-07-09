@@ -7,9 +7,13 @@ function safeNext(value: string | null) {
 }
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url)
+  const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
   const next = safeNext(searchParams.get('next'))
+  // No usar el origin de request.url: detrás del proxy de Easypanel puede
+  // resolver a la dirección interna del contenedor (p.ej. 0.0.0.0) en vez del
+  // dominio público, rompiendo todos los redirects de este handler.
+  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://traintools.es'
 
   if (code) {
     const supabase = await createClient()
