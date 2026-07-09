@@ -13,9 +13,9 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@ai-sdk/openai": "^4.0.9",
     "@ai-sdk/react": "^4.0.19",
     "@hookform/resolvers": "^5.4.0",
-    "@openrouter/ai-sdk-provider": "^3.0.0",
     "@radix-ui/react-avatar": "^1.2.2",
     "@radix-ui/react-dialog": "^1.1.19",
     "@radix-ui/react-progress": "^1.1.12",

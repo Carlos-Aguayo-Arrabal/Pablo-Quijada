@@ -5,7 +5,7 @@ import { generateObject } from 'ai'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { isDemoSession } from '@/features/demo/server'
-import { getOpenRouter, MODELS } from '@/lib/ai/openrouter'
+import { getOpenAI, MODELS } from '@/lib/ai/openai'
 import type { AiSummary } from '@/features/ai-summary/data'
 
 const summarySchema = z.object({
@@ -118,7 +118,7 @@ Genera un resumen honesto y accionable, con entre 2 y 4 puntos clave. Si no hay 
 
   try {
     const { object } = await generateObject({
-      model: getOpenRouter()(MODELS.balanced),
+      model: getOpenAI()(MODELS.balanced),
       schema: summarySchema,
       prompt,
       maxOutputTokens: 1000,
