@@ -1,13 +1,25 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { ClientSignupForm } from '@/features/client/components/client-signup-form'
+import { ClientInviteRetry } from '@/features/client/components/client-invite-retry'
+import { createClient } from '@/lib/supabase/server'
 
 export const metadata: Metadata = {
   title: 'Activa tu acceso',
   description: 'Crea tu contraseña para acceder a tu portal de entrenamiento.',
 }
 
-export default function ClientSignupPage() {
+export default async function ClientSignupPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>
+}) {
+  const { error } = await searchParams
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const showRetry = error === 'no_invite' && Boolean(user)
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#080C14] px-4 py-12">
       <div className="w-full max-w-md">
@@ -17,9 +29,13 @@ export default function ClientSignupPage() {
             Tu entrenador te ha invitado a TrainTools. Crea tu contraseña para entrar a tu portal.
           </p>
         </div>
-        <Suspense fallback={null}>
-          <ClientSignupForm />
-        </Suspense>
+        {showRetry ? (
+          <ClientInviteRetry />
+        ) : (
+          <Suspense fallback={null}>
+            <ClientSignupForm />
+          </Suspense>
+        )}
       </div>
     </div>
   )

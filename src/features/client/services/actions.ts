@@ -48,6 +48,17 @@ export async function startClientDemo() {
   return { success: true }
 }
 
+export async function retryClaimClientInvite() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'No has iniciado sesión' }
+
+  const { error } = await supabase.rpc('claim_client_invite')
+  if (error) return { error: 'No encontramos una invitación pendiente para tu email' }
+
+  return { success: true }
+}
+
 function parseWorkSeconds(repeticiones: string) {
   const match = repeticiones.match(/\d+/)
   const reps = match ? Number(match[0]) : 10
