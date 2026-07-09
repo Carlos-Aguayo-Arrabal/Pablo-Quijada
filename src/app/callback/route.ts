@@ -30,9 +30,10 @@ export async function GET(request: Request) {
       // Defensa en profundidad: aunque `next` no apunte a /client, si la cuenta
       // ya es de un cliente (p.ej. login con Google reutilizando ese email),
       // nunca debe aterrizar en /dashboard — el middleware lo bloquearía de
-      // todas formas, pero evitamos el salto extra.
+      // todas formas, pero evitamos el salto extra. No aplica a destinos
+      // explícitos compartidos por ambos roles (ej. cambiar contraseña).
       const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
+      if (user && next !== '/update-password') {
         const { data: clienteRow } = await supabase
           .from('clientes')
           .select('id')

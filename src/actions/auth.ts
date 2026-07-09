@@ -92,7 +92,12 @@ export async function resetPassword(email: string) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://traintools.es'
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${siteUrl}/update-password`,
+    // El enlace del email trae un código PKCE que hay que canjear por una
+    // sesión antes de poder actualizar la contraseña — por eso pasa por
+    // /callback (igual que la confirmación de signup), no directo a
+    // /update-password. Sin este paso, updateUser() falla con
+    // "Auth session missing!" porque nunca se estableció sesión.
+    redirectTo: `${siteUrl}/callback?next=${encodeURIComponent('/update-password')}`,
   })
 
   if (error) {
