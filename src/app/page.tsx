@@ -15,11 +15,12 @@ import {
 } from 'lucide-react'
 import { Navbar } from '@/shared/components/navbar'
 import { GradientBackground } from '@/shared/components/gradient-background'
+import { HeroDemoLink } from '@/shared/components/hero-demo-link'
 
 export const metadata: Metadata = {
   title: 'TrainTools — Gestiona tu negocio fitness',
   description:
-    'Plataforma para entrenadores, nutricionistas y centros wellness: clientes, rutinas, nutricion, citas, pagos y seguimiento en un solo lugar.',
+    'Plataforma para entrenadores, nutricionistas y centros wellness: clientes, rutinas, nutrición, citas, pagos y seguimiento en un solo lugar.',
 }
 
 const features = [
@@ -32,19 +33,19 @@ const features = [
   {
     icon: Dumbbell,
     title: 'Rutinas y programas',
-    desc: 'Crea planes por dias, adjunta videos, repeticiones, cargas, descansos y notas para que cada cliente sepa exactamente que hacer.',
+    desc: 'Crea planes por días, adjunta vídeos, repeticiones, cargas, descansos y notas para que cada cliente sepa exactamente qué hacer.',
     color: '#FFB000',
   },
   {
     icon: ClipboardList,
-    title: 'Nutricion y habitos',
-    desc: 'Organiza menus, alternativas, check-ins y habitos diarios para acompanar el progreso mas alla del entrenamiento.',
+    title: 'Nutrición y hábitos',
+    desc: 'Organiza menús, alternativas, check-ins y hábitos diarios para acompañar el progreso más allá del entrenamiento.',
     color: '#FB923C',
   },
   {
     icon: MessageSquare,
     title: 'Chat y comunidad',
-    desc: 'Mantén la conversacion dentro del servicio, con contexto de cada plan y mensajes accionables.',
+    desc: 'Mantén la conversación dentro del servicio, con contexto de cada plan y mensajes accionables.',
     color: '#FF6A00',
   },
   {
@@ -69,10 +70,22 @@ const stats = [
 ]
 
 const workflow = [
-  'Crea tu servicio y precio',
-  'Invita clientes a su app',
-  'Asigna planes y tareas',
-  'Mide progreso y cobra a tiempo',
+  {
+    title: 'Crea tu servicio y precio',
+    desc: 'Define el servicio, el precio mensual y qué incluye en pocos minutos.',
+  },
+  {
+    title: 'Invita clientes a su app',
+    desc: 'Cada cliente recibe su propio acceso para ver su plan y hablar contigo.',
+  },
+  {
+    title: 'Asigna planes y tareas',
+    desc: 'Reparte rutinas, nutrición y check-ins según el objetivo de cada uno.',
+  },
+  {
+    title: 'Mide progreso y cobra a tiempo',
+    desc: 'Sigue la adherencia y gestiona pagos y renovaciones desde el mismo panel.',
+  },
 ]
 
 export default function HomePage() {
@@ -91,18 +104,16 @@ export default function HomePage() {
               Gestiona tu negocio fitness desde un solo panel.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-relaxed text-[#94A3B8] sm:text-lg">
-              TrainTools te ayuda a organizar clientes, rutinas, nutricion, citas, comunicacion y pagos para ofrecer un servicio mas profesional sin vivir entre hojas de calculo.
+              TrainTools te ayuda a organizar clientes, rutinas, nutrición, citas, comunicación y pagos para ofrecer un servicio más profesional sin vivir entre hojas de cálculo.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link href="/signup" className="btn-primary px-7 py-3.5 text-base">
                 Probar gratis
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/dashboard" className="btn-secondary px-7 py-3.5 text-base">
-                Ver demo
-              </Link>
+              <HeroDemoLink className="btn-secondary px-7 py-3.5 text-base" />
               <Link href="/client" className="btn-secondary px-7 py-3.5 text-base">
-                Ver cliente real
+                Ver demo cliente
               </Link>
             </div>
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-[#94A3B8]">
@@ -137,12 +148,12 @@ export default function HomePage() {
 
             <div className="mt-4 rounded-xl border border-[#FF6A00]/15 bg-[#FF6A00]/5 p-4">
               <div className="mb-3 flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-white">Clientes que requieren atencion</h3>
+                <h3 className="text-sm font-semibold text-white">Clientes que requieren atención</h3>
                 <LineChart className="h-4 w-4 text-[#FF6A00]" />
               </div>
               {[
                 ['Laura Martin', 'Check-in completado', 'Responder'],
-                ['Carlos Ruiz', 'Pago vence manana', 'Cobro'],
+                ['Carlos Ruiz', 'Pago vence mañana', 'Cobro'],
                 ['Marta Vega', 'Rutina finalizada', 'Actualizar'],
               ].map(([name, detail, action]) => (
                 <div key={name} className="flex items-center justify-between border-t border-white/[0.06] py-3 first:border-t-0 first:pt-0 last:pb-0">
@@ -187,13 +198,13 @@ export default function HomePage() {
         <div className="container-fit">
           <div className="grid gap-6 md:grid-cols-4">
             {workflow.map((step, index) => (
-              <div key={step} className="flex gap-4">
+              <div key={step.title} className="flex gap-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#FF6A00]/25 bg-[#FF6A00]/10 text-sm font-bold text-[#FF6A00]">
                   {index + 1}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white">{step}</h3>
-                  <p className="mt-1 text-sm text-[#94A3B8]">Simple, trazable y listo para escalar.</p>
+                  <h3 className="font-semibold text-white">{step.title}</h3>
+                  <p className="mt-1 text-sm text-[#94A3B8]">{step.desc}</p>
                 </div>
               </div>
             ))}
@@ -208,7 +219,7 @@ export default function HomePage() {
               Empieza con tu primer grupo de clientes.
             </h2>
             <p className="mt-4 text-[#94A3B8]">
-              Un MVP pensado para coaches que quieren vender mejor, entregar mejor y medir mejor desde el primer dia.
+              Un MVP pensado para coaches que quieren vender mejor, entregar mejor y medir mejor desde el primer día.
             </p>
           </div>
           <div className="rounded-2xl border border-[#FF6A00]/25 bg-gradient-to-br from-[#FF6A00]/10 to-[#FFB000]/10 p-6">
