@@ -17,6 +17,7 @@ export type ClienteTipoProximaAccion = 'seguimiento' | 'mensaje' | 'pago' | 'pla
 export type Cliente = {
   id: string
   entrenador_id: string
+  user_id: string | null
   nombre: string
   email: string
   telefono: string | null
@@ -118,6 +119,7 @@ export type ProgramaVisibilidad = 'privado' | 'compartido' | 'publico'
 export type Programa = {
   id: string
   entrenador_id: string
+  cliente_id: string | null
   nombre: string
   duracion_total_semanas: number
   estado: ProgramaEstado
@@ -417,7 +419,12 @@ export interface Database {
       }
     }
     Views: Record<string, never>
-    Functions: Record<string, never>
+    Functions: {
+      claim_client_invite: {
+        Args: Record<string, never>
+        Returns: Cliente
+      }
+    }
     Enums: Record<string, never>
     CompositeTypes: Record<string, never>
   }

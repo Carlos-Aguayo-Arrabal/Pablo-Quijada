@@ -1,0 +1,73 @@
+import type { ClientPlan, MyMessage, MyProfile } from '@/features/client/types'
+
+export function getDemoProfile(): MyProfile {
+  return { nombre: 'Laura', email: 'laura@cliente.demo', adherencia: 91, pesoActual: '78.4' }
+}
+
+export function getDemoPlan(): ClientPlan {
+  return {
+    programaNombre: 'Fuerza 12 semanas',
+    sessionNombre: 'Fuerza torso + core',
+    exercises: [
+      {
+        id: 'sentadilla-goblet',
+        name: 'Sentadilla goblet',
+        sets: 4,
+        repsLabel: '10',
+        rpeRir: 'RPE 7',
+        restSeconds: 90,
+        workSeconds: 40,
+      },
+      {
+        id: 'press-banca',
+        name: 'Press banca con mancuernas',
+        sets: 4,
+        repsLabel: '8',
+        rpeRir: 'RPE 8',
+        restSeconds: 120,
+        workSeconds: 32,
+      },
+      {
+        id: 'remo-polea',
+        name: 'Remo en polea',
+        sets: 3,
+        repsLabel: '12',
+        rpeRir: 'RPE 7',
+        restSeconds: 75,
+        workSeconds: 48,
+      },
+      {
+        id: 'plancha',
+        name: 'Plancha frontal',
+        sets: 3,
+        repsLabel: '40s',
+        rpeRir: null,
+        restSeconds: 60,
+        workSeconds: 40,
+      },
+    ],
+  }
+}
+
+export function getDemoMessages(): MyMessage[] {
+  return [
+    {
+      id: 'demo-1',
+      remitente: 'entrenador',
+      contenido: 'Perfecto, hoy toca fuerza. Si notas molestia en hombro, baja carga en press.',
+      creadoEn: new Date().toISOString(),
+    },
+  ]
+}
+
+export const DEMO_HABITS = [
+  { id: 'protein', label: 'Llegar a 150 g de proteína', detail: 'Objetivo nutricional diario' },
+  { id: 'steps', label: '8.000 pasos', detail: 'Actividad fuera del entrenamiento' },
+  { id: 'water', label: '2,5 L de agua', detail: 'Hidratación' },
+] as const
+
+export const DEMO_MEALS = [
+  { name: 'Desayuno', content: 'Yogur griego, avena, frutos rojos y nueces', macros: '520 kcal · 38P / 58C / 16G' },
+  { name: 'Comida', content: 'Arroz, pollo, verduras y aceite de oliva', macros: '710 kcal · 52P / 82C / 18G' },
+  { name: 'Cena', content: 'Salmón, patata cocida y ensalada grande', macros: '640 kcal · 46P / 50C / 24G' },
+] as const

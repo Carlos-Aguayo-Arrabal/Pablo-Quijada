@@ -50,7 +50,9 @@ export function LoginForm({ redirectTo = '/dashboard' }: LoginFormProps) {
       return
     }
 
-    router.push(redirectTo)
+    // Un cliente siempre va a /client, sin importar el redirectTo solicitado
+    // (deep link de un entrenador). El resto respeta el redirectTo pedido.
+    router.push(result.redirectTo === '/client' ? '/client' : redirectTo)
     router.refresh()
   }
 

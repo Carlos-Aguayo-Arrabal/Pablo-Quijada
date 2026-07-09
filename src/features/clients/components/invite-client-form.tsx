@@ -18,9 +18,10 @@ export function InviteClientForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const inviteUrl = useMemo(() => {
-    const slug = name.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'nuevo-cliente'
-    return `https://traintools.es/client/invite/${slug}`
-  }, [name])
+    const trimmedEmail = email.trim()
+    if (!trimmedEmail) return 'https://traintools.es/client/signup'
+    return `https://traintools.es/client/signup?email=${encodeURIComponent(trimmedEmail)}`
+  }, [email])
 
   async function sendInvite() {
     setError(null)

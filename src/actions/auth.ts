@@ -3,18 +3,18 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { isDemoCredentials } from '@/features/demo/auth'
-import { clearDemoSession, setDemoSession } from '@/features/demo/server'
+import { clearDemoSession, setDemoSession, clearDemoClientSession } from '@/features/demo/server'
 import type { FitnessGoal } from '@/types/database'
 
 export async function login(email: string, password: string) {
   if (isDemoCredentials(email, password)) {
     await setDemoSession()
-    return { success: true }
+    return { success: true, redirectTo: '/dashboard' }
   }
 
   const supabase = await createClient()
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
   if (error) {
     if (error.message.includes('Invalid login credentials')) {
@@ -26,7 +26,17 @@ export async function login(email: string, password: string) {
     return { error: error.message }
   }
 
-  return { success: true }
+  // El rol (entrenador vs cliente) no vive en la sesión: se resuelve comprobando
+  // si el usuario tiene una fila en `clientes.user_id`. Un cliente SIEMPRE va a
+  // /client, sin importar el `redirectTo` solicitado (el middleware lo forzaría
+  // igualmente, pero así evitamos el salto extra).
+  const { data: clienteRow } = await supabase
+    .from('clientes')
+    .select('id')
+    .eq('user_id', data.user.id)
+    .maybeSingle()
+
+  return { success: true, redirectTo: clienteRow ? '/client' : '/dashboard' }
 }
 
 export async function signup(input: {
@@ -62,6 +72,7 @@ export async function signup(input: {
 
 export async function signout() {
   await clearDemoSession()
+  await clearDemoClientSession()
   const supabase = await createClient()
   await supabase.auth.signOut()
   redirect('/login')
