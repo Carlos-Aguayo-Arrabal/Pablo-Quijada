@@ -8,9 +8,18 @@ import type { FitnessGoal } from '@/types/database'
 
 export async function login(email: string, password: string) {
   if (isDemoCredentials(email, password)) {
+    await clearDemoClientSession()
     await setDemoSession()
     return { success: true, redirectTo: '/dashboard' }
   }
+
+  // Un login real siempre debe salir de cualquier modo demo. Si no se limpian
+  // estas cookies, una sesión demo previa (entrenador o cliente) sigue activa
+  // en paralelo y las server actions que comprueban isDemoSession()/
+  // isDemoClientSession() siguen comportándose como demo (no escriben en la
+  // BD) aunque el usuario ya esté autenticado de verdad.
+  await clearDemoSession()
+  await clearDemoClientSession()
 
   const supabase = await createClient()
 
