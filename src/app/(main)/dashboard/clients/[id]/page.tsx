@@ -13,6 +13,9 @@ import { clientMetrics, getAdherenceTone, getStatusTone } from '@/features/clien
 import { getClientById } from '@/features/clients/services/actions'
 import { ClientProfileTabs } from '@/features/clients/components/client-profile-tabs'
 import { listPaymentsByClient } from '@/features/payments/services/actions'
+import { listPerformanceTests } from '@/features/performance-tests/services/actions'
+import { listWellnessHistory } from '@/features/wellness/services/actions'
+import { getLatestSummary } from '@/features/ai-summary/services/actions'
 import { cn } from '@/shared/lib/utils'
 
 export const metadata: Metadata = {
@@ -25,7 +28,13 @@ export default async function ClientDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const [client, payments] = await Promise.all([getClientById(id), listPaymentsByClient(id)])
+  const [client, payments, tests, wellnessHistory, aiSummary] = await Promise.all([
+    getClientById(id),
+    listPaymentsByClient(id),
+    listPerformanceTests(id),
+    listWellnessHistory(id),
+    getLatestSummary(id),
+  ])
   if (!client) notFound()
 
   return (
@@ -92,7 +101,13 @@ export default async function ClientDetailPage({
         })}
       </div>
 
-      <ClientProfileTabs client={client} payments={payments} />
+      <ClientProfileTabs
+        client={client}
+        payments={payments}
+        tests={tests}
+        wellnessHistory={wellnessHistory}
+        aiSummary={aiSummary}
+      />
     </div>
   )
 }

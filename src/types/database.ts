@@ -226,6 +226,47 @@ export type Notificacion = {
   creado_en: string
 }
 
+export type CuestionarioBienestar = {
+  id: string
+  entrenador_id: string
+  cliente_id: string
+  sueno: number
+  estres: number
+  dolor: number
+  energia: number
+  notas: string | null
+  creado_en: string
+}
+
+export type TestFisicoCategoria = 'fuerza' | 'resistencia' | 'flexibilidad' | 'medidas' | 'otro'
+
+export type TestFisico = {
+  id: string
+  entrenador_id: string
+  cliente_id: string
+  categoria: TestFisicoCategoria
+  nombre: string
+  valor: number
+  unidad: string
+  fecha_test: string
+  notas: string | null
+  creado_en: string
+}
+
+export type ResumenIaEstado = 'optimo' | 'estable' | 'atencion' | 'riesgo'
+
+export type ResumenIa = {
+  id: string
+  entrenador_id: string
+  cliente_id: string
+  estado_general: ResumenIaEstado
+  resumen: string
+  puntos_clave: string[]
+  recomendacion: string
+  modelo: string
+  generado_en: string
+}
+
 export type Program = Programa
 export type Phase = FasePrograma
 export type Week = SemanaPrograma
@@ -416,6 +457,48 @@ export interface Database {
           Partial<Omit<Notificacion, 'id' | 'usuario_id' | 'tipo' | 'titulo' | 'creado_en'>>
         Update: Partial<Omit<Notificacion, 'id' | 'creado_en'>>
         Relationships: []
+      }
+      cuestionarios_bienestar: {
+        Row: CuestionarioBienestar
+        Insert: Pick<CuestionarioBienestar, 'entrenador_id' | 'cliente_id' | 'sueno' | 'estres' | 'dolor' | 'energia'> &
+          Partial<Omit<CuestionarioBienestar, 'id' | 'entrenador_id' | 'cliente_id' | 'sueno' | 'estres' | 'dolor' | 'energia' | 'creado_en'>>
+        Update: Partial<Omit<CuestionarioBienestar, 'id' | 'creado_en'>>
+        Relationships: [
+          {
+            foreignKeyName: 'cuestionarios_bienestar_cliente_id_fkey'
+            columns: ['cliente_id']
+            referencedRelation: 'clientes'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      tests_fisicos: {
+        Row: TestFisico
+        Insert: Pick<TestFisico, 'entrenador_id' | 'cliente_id' | 'categoria' | 'nombre' | 'valor' | 'unidad'> &
+          Partial<Omit<TestFisico, 'id' | 'entrenador_id' | 'cliente_id' | 'categoria' | 'nombre' | 'valor' | 'unidad' | 'creado_en'>>
+        Update: Partial<Omit<TestFisico, 'id' | 'creado_en'>>
+        Relationships: [
+          {
+            foreignKeyName: 'tests_fisicos_cliente_id_fkey'
+            columns: ['cliente_id']
+            referencedRelation: 'clientes'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      resumenes_ia: {
+        Row: ResumenIa
+        Insert: Pick<ResumenIa, 'entrenador_id' | 'cliente_id' | 'estado_general' | 'resumen' | 'recomendacion' | 'modelo'> &
+          Partial<Omit<ResumenIa, 'id' | 'entrenador_id' | 'cliente_id' | 'estado_general' | 'resumen' | 'recomendacion' | 'modelo' | 'generado_en'>>
+        Update: Partial<Omit<ResumenIa, 'id' | 'generado_en'>>
+        Relationships: [
+          {
+            foreignKeyName: 'resumenes_ia_cliente_id_fkey'
+            columns: ['cliente_id']
+            referencedRelation: 'clientes'
+            referencedColumns: ['id']
+          },
+        ]
       }
     }
     Views: Record<string, never>

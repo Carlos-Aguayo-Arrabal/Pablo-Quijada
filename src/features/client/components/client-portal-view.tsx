@@ -8,6 +8,7 @@ import { TodayWorkoutPanel } from '@/features/client/components/today-workout-pa
 import { HabitsPanel, NutritionPanel } from '@/features/client/components/habits-panel'
 import { CheckinForm } from '@/features/client/components/checkin-form'
 import { CoachChat } from '@/features/client/components/coach-chat'
+import { WellnessForm } from '@/features/wellness/components/wellness-form'
 import type { ClientPlan, MyMessage, MyProfile } from '@/features/client/types'
 
 function initialsFor(name: string) {
@@ -95,6 +96,7 @@ export function ClientPortalView({ profile, plan, initialMessages, isDemo }: Cli
           <div className="space-y-6">
             <HabitsPanel />
             <CheckinForm pesoActual={profile.pesoActual} />
+            <WellnessForm />
             <CoachChat initialMessages={initialMessages} />
           </div>
         </section>

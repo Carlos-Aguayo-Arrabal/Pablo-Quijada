@@ -7,16 +7,19 @@ import {
   CheckCircle2,
   Dumbbell,
   MessageSquare,
-  Scale,
   Utensils,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import {
   clientTimeline,
-  getAdherenceTone,
   type ClientRecord,
 } from '@/features/clients/data'
 import type { PaymentRecord } from '@/features/payments/types'
+import type { PerformanceTest } from '@/features/performance-tests/data'
+import { TestsList } from '@/features/performance-tests/components/tests-list'
+import type { WellnessCheck } from '@/features/wellness/data'
+import type { AiSummary } from '@/features/ai-summary/data'
+import { AiSummaryCard } from '@/features/ai-summary/components/ai-summary-card'
 
 type ClientTab = 'Resumen' | 'Entrenamiento' | 'Nutrición' | 'Progreso' | 'Pagos' | 'Mensajes'
 
@@ -35,13 +38,6 @@ const nutritionItems = [
   { label: 'Agua', value: '2,5 L', note: 'Hidratación' },
 ]
 
-const progressData = [
-  { label: 'Peso', current: '64.8 kg', change: '-0.6 kg', positive: true },
-  { label: 'Cintura', current: '72 cm', change: '-2 cm', positive: true },
-  { label: 'Sentadilla goblet', current: '26 kg', change: '+4 kg', positive: true },
-  { label: 'Energía media', current: '7/10', change: '+1', positive: true },
-]
-
 const messages = [
   { from: 'Cliente', text: 'Hoy me noto bien, ¿subo un poco el peso en press?', time: 'Hace 2 h' },
   { from: 'Coach', text: 'Sí, sube 2 kg si mantienes técnica y no aparece molestia.', time: 'Hace 1 h' },
@@ -51,9 +47,12 @@ const messages = [
 interface ClientProfileTabsProps {
   client: ClientRecord
   payments: PaymentRecord[]
+  tests: PerformanceTest[]
+  wellnessHistory: WellnessCheck[]
+  aiSummary: AiSummary | null
 }
 
-export function ClientProfileTabs({ client, payments }: ClientProfileTabsProps) {
+export function ClientProfileTabs({ client, payments, tests, wellnessHistory, aiSummary }: ClientProfileTabsProps) {
   const [activeTab, setActiveTab] = useState<ClientTab>('Resumen')
 
   return (
@@ -112,6 +111,7 @@ export function ClientProfileTabs({ client, payments }: ClientProfileTabsProps) 
               </div>
             </section>
 
+            <AiSummaryCard clienteId={client.id} initialSummary={aiSummary} />
             <RiskPanel client={client} />
           </aside>
         </div>
@@ -170,28 +170,12 @@ export function ClientProfileTabs({ client, payments }: ClientProfileTabsProps) 
       )}
 
       {activeTab === 'Progreso' && (
-        <section className="glass-card rounded-2xl p-5">
-          <h2 className="mb-5 text-sm font-bold text-white">Progreso reciente</h2>
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {progressData.map((item) => (
-              <div key={item.label} className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
-                <Scale className="mb-3 h-5 w-5 text-[#FF6A00]" />
-                <p className="text-xs text-[#475569]">{item.label}</p>
-                <p className="mt-1 text-2xl font-black text-white">{item.current}</p>
-                <p className="mt-1 text-xs font-bold text-[#FF6A00]">{item.change}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-5">
-            <div className="mb-2 flex items-center justify-between text-xs">
-              <span className="text-[#94A3B8]">Adherencia global</span>
-              <span className={cn('font-bold', getAdherenceTone(client.adherence))}>{client.adherence}%</span>
-            </div>
-            <div className="progress-bar">
-              <div className="progress-fill" style={{ width: `${client.adherence}%` }} />
-            </div>
-          </div>
-        </section>
+        <TestsList
+          clienteId={client.id}
+          tests={tests}
+          wellnessHistory={wellnessHistory}
+          adherencia={client.adherence}
+        />
       )}
 
       {activeTab === 'Pagos' && (
