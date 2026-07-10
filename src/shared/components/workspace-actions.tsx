@@ -136,7 +136,12 @@ export function WorkspaceActions({
             </span>
           )}
         </button>
-        <ActionButton icon={Settings} label="Ajustes" active={activePanel === 'settings'} onClick={() => togglePanel('settings')} />
+        {/* El entrenador ya tiene "Configuración" + usuario + cerrar sesión en el
+            sidebar — repetirlo aquí era redundante. El cliente no tiene sidebar,
+            así que para él este es el único sitio donde ajustar notificaciones. */}
+        {mode === 'client' && (
+          <ActionButton icon={Settings} label="Ajustes" active={activePanel === 'settings'} onClick={() => togglePanel('settings')} />
+        )}
       </div>
 
       {activePanel && (
