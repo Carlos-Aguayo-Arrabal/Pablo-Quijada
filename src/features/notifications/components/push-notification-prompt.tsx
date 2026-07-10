@@ -37,7 +37,7 @@ export function PushNotificationPrompt({ userId, autoShowDelay = 3000 }: PushNot
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 max-w-sm space-y-3 rounded-2xl border border-white/[0.08] bg-[#111B26] p-4 shadow-2xl shadow-black/30">
+    <div className="fixed bottom-20 right-4 z-50 max-w-sm space-y-3 rounded-2xl border border-white/[0.08] bg-[#111B26] p-4 shadow-2xl shadow-black/30 md:bottom-4">
       <div className="flex items-center gap-2">
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#FF6A00]/15 text-[#FF6A00]">
           <Bell className="h-4 w-4" />

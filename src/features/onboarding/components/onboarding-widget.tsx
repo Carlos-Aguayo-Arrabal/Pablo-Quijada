@@ -23,7 +23,7 @@ export function OnboardingWidget({ initialStatus }: { initialStatus: OnboardingS
   return (
     <>
       {isOpen && (
-        <div className="fixed bottom-40 right-4 z-50 w-80 rounded-2xl border border-white/[0.08] bg-[#111B26] p-4 shadow-2xl shadow-black/40">
+        <div className="fixed bottom-56 right-4 z-50 w-[min(20rem,calc(100vw-2rem))] rounded-2xl border border-white/[0.08] bg-[#111B26] p-4 shadow-2xl shadow-black/40 md:bottom-40">
           <div className="mb-3 flex items-center justify-between">
             <p className="text-sm font-bold text-white">Explora TrainTools</p>
             <button
@@ -96,7 +96,7 @@ export function OnboardingWidget({ initialStatus }: { initialStatus: OnboardingS
       <button
         type="button"
         onClick={() => setIsOpen((v) => !v)}
-        className="fixed bottom-24 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-[#FF6A00] text-[#080C14] shadow-2xl shadow-black/40 transition hover:bg-[#FFB000]"
+        className="fixed bottom-36 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-[#FF6A00] text-[#080C14] shadow-2xl shadow-black/40 transition hover:bg-[#FFB000] md:bottom-24"
         aria-label="Explora TrainTools"
       >
         <Gift className="h-5 w-5" />

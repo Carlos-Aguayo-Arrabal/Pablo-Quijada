@@ -1,4 +1,5 @@
 import { Sidebar } from '@/shared/components/sidebar'
+import { MobileNav } from '@/shared/components/mobile-nav'
 import { WorkspaceActions } from '@/shared/components/workspace-actions'
 import { PWARegister } from '@/shared/components/pwa-register'
 import { PushNotificationPrompt } from '@/features/notifications/components/push-notification-prompt'
@@ -38,7 +39,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
       </div>
 
       {/* Main content area */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto pb-16 md:pb-0">
         {/* Gradient mesh background */}
         <div className="pointer-events-none fixed inset-0 -z-0">
           <div
@@ -74,6 +75,8 @@ export default async function MainLayout({ children }: { children: React.ReactNo
           {children}
         </div>
       </main>
+
+      <MobileNav userName={userName} userEmail={userEmail} />
 
       <PWARegister />
       {user && !demoSession && <PushNotificationPrompt userId={user.id} />}
