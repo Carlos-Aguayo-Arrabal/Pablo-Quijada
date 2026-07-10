@@ -8,7 +8,6 @@ import {
   CheckCircle2,
   ClipboardCheck,
   ClipboardList,
-  Clock,
   Dumbbell,
   MessageSquare,
   Plus,
@@ -21,6 +20,7 @@ import {
 import { StatsCard } from '@/features/dashboard/components/stats-card'
 import { WeeklyProgressChart } from '@/features/dashboard/components/progress-chart'
 import { getDashboardSummary } from '@/features/dashboard/services/actions'
+import { listSessions } from '@/features/agenda/services/actions'
 
 export const metadata: Metadata = {
   title: 'Dashboard',
@@ -53,7 +53,35 @@ const toneClass = {
 
 export default async function DashboardPage() {
   const today = new Date()
-  const summary = await getDashboardSummary()
+  const in7days = new Date(today)
+  in7days.setDate(in7days.getDate() + 7)
+
+  const [summary, upcomingSessionsRaw] = await Promise.all([
+    getDashboardSummary(),
+    listSessions({ from: today.toISOString(), to: in7days.toISOString() }),
+  ])
+
+  const upcomingSessions = upcomingSessionsRaw
+    .filter((session) => session.estado === 'programada')
+    .slice(0, 3)
+
+  const quickTasks = [
+    summary.pendingCheckinsCount > 0 && {
+      icon: CheckCircle2,
+      label: `Aprobar ${summary.pendingCheckinsCount} check-in${summary.pendingCheckinsCount === 1 ? '' : 's'}`,
+      href: '/dashboard/checkins',
+    },
+    summary.unreadThreadsCount > 0 && {
+      icon: MessageSquare,
+      label: `Responder ${summary.unreadThreadsCount} mensaje${summary.unreadThreadsCount === 1 ? '' : 's'}`,
+      href: '/dashboard/messages',
+    },
+    summary.pendingPayments.length > 0 && {
+      icon: BadgeEuro,
+      label: `${summary.pendingPayments.length} pago${summary.pendingPayments.length === 1 ? '' : 's'} pendiente${summary.pendingPayments.length === 1 ? '' : 's'}`,
+      href: '/dashboard/payments',
+    },
+  ].filter((task): task is { icon: typeof CheckCircle2; label: string; href: string } => Boolean(task))
 
   const todayTasks = [
     {
@@ -113,14 +141,15 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-3 xl:grid-cols-4">
+      <div className="flex flex-col gap-6">
+      <div className="order-3 grid grid-cols-2 gap-3 xl:order-1 xl:grid-cols-4">
         <StatsCard title="Clientes activos" value={summary.stats.activeClients} icon={Users} iconColor="teal" />
         <StatsCard title="Ingresos mensuales" value={summary.stats.mrr.toFixed(0)} unit="€" icon={BadgeEuro} iconColor="indigo" />
         <StatsCard title="Adherencia media" value={summary.stats.avgAdherence} unit="%" icon={TrendingUp} iconColor="teal" progress={summary.stats.avgAdherence} />
         <StatsCard title="Clientes en riesgo" value={summary.stats.riskCount} icon={AlertTriangle} iconColor="red" />
       </div>
 
-      <div className="mb-6 grid gap-3 lg:grid-cols-4">
+      <div className="order-2 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {todayTasks.map((task) => (
           <Link key={task.title} href={task.href} className="group rounded-2xl border border-white/[0.08] bg-[#111B26] p-4 transition hover:border-[#FF6A00]/40 hover:bg-[#142231]">
             <div className="mb-4 flex items-start justify-between gap-3">
@@ -138,9 +167,9 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1.45fr_0.9fr]">
+      <div className="order-1 grid grid-cols-1 gap-6 xl:order-3 xl:grid-cols-[1.45fr_0.9fr]">
         <div className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[0.95fr_1.05fr]">
             <WeeklyProgressChart data={weeklyData} label="Entrenos completados" unit="entrenos" color="teal" />
 
             <section className="glass-card rounded-2xl p-5">
@@ -175,7 +204,7 @@ export default async function DashboardPage() {
             </section>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <section className="glass-card rounded-2xl p-5">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-sm font-bold text-white">Check-ins pendientes</h2>
@@ -223,7 +252,7 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <aside className="space-y-6">
+        <aside className="order-first space-y-6 xl:order-none">
           <section className="rounded-2xl border border-[#FF6A00]/25 bg-gradient-to-br from-[#FF6A00]/12 to-[#FFB000]/10 p-5">
             <div className="mb-4 flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0D1117] text-[#FF6A00]">
@@ -272,36 +301,40 @@ export default async function DashboardPage() {
           </section>
 
           <section className="glass-card rounded-2xl p-5">
-            <h2 className="mb-4 text-sm font-bold text-white">Próximas citas</h2>
-            {[
-              ['09:30', 'Revisión semanal', 'Laura Martin'],
-              ['11:00', 'Sesión presencial', 'Carlos Ruiz'],
-              ['16:30', 'Onboarding', 'Nueva clienta'],
-            ].map(([time, title, client]) => (
-              <Link key={`${time}-${client}`} href="/dashboard/history" className="mb-2 flex gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] p-3 transition hover:bg-white/[0.06] last:mb-0">
-                <span className="text-xs font-bold text-[#FF6A00]">{time}</span>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-sm font-bold text-white">Próximas citas</h2>
+              <Link href="/dashboard/history" className="text-xs font-semibold text-[#FF6A00] hover:text-[#FFB000]">Ver agenda</Link>
+            </div>
+            {upcomingSessions.map((session) => (
+              <Link key={session.id} href="/dashboard/history" className="mb-2 flex gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] p-3 transition hover:bg-white/[0.06] last:mb-0">
+                <span className="text-xs font-bold text-[#FF6A00]">
+                  {new Date(session.fechaHora).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                </span>
                 <span>
-                  <span className="block text-sm font-semibold text-white">{title}</span>
-                  <span className="block text-xs text-[#94A3B8]">{client}</span>
+                  <span className="block text-sm font-semibold text-white">{session.titulo}</span>
+                  <span className="block text-xs text-[#94A3B8]">{session.clienteNombre}</span>
                 </span>
               </Link>
             ))}
+            {upcomingSessions.length === 0 && (
+              <p className="text-sm text-[#94A3B8]">No tienes citas programadas los próximos 7 días.</p>
+            )}
           </section>
 
           <section className="glass-card rounded-2xl p-5">
             <h2 className="mb-4 text-sm font-bold text-white">Tareas rápidas</h2>
-            {[
-              { icon: CheckCircle2, label: 'Aprobar 6 check-ins', href: '/dashboard/checkins' },
-              { icon: Clock, label: 'Programar recordatorios', href: '/dashboard/history' },
-              { icon: MessageSquare, label: 'Responder mensajes', href: '/dashboard/messages' },
-            ].map((task) => (
+            {quickTasks.map((task) => (
               <Link key={task.label} href={task.href} className="mb-2 flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-[#94A3B8] transition hover:bg-white/[0.05] hover:text-white last:mb-0">
                 <task.icon className="h-4 w-4 text-[#FF6A00]" />
                 {task.label}
               </Link>
             ))}
+            {quickTasks.length === 0 && (
+              <p className="text-sm text-[#94A3B8]">Todo al día. Sin tareas pendientes ahora mismo.</p>
+            )}
           </section>
         </aside>
+      </div>
       </div>
     </div>
   )
