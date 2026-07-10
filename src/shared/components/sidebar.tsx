@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -203,20 +204,24 @@ export function Sidebar({
         </div>
       </div>
 
-      {hoveredItem && (
-        <div
-          className="pointer-events-none fixed z-50 w-64 rounded-xl border border-white/10 bg-[#0D1421] p-4 shadow-2xl shadow-black/40"
-          style={{ left: '17rem', top: hoveredItem && hovered ? hovered.top : 0 }}
-        >
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#FF6A00]/15 text-[#FF6A00]">
-              <hoveredItem.icon className="h-4 w-4" />
-            </span>
-            <p className="text-sm font-semibold text-white">{hoveredItem.label}</p>
-          </div>
-          <p className="mt-2 text-xs leading-relaxed text-[#94A3B8]">{hoveredItem.description}</p>
-        </div>
-      )}
+      {hoveredItem &&
+        hovered &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            className="pointer-events-none fixed z-[100] w-64 rounded-xl border border-[#FF6A00]/25 bg-[#151B2C] p-4 shadow-2xl shadow-black/60 ring-1 ring-black/40"
+            style={{ left: '17rem', top: hovered.top }}
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#FF6A00]/15 text-[#FF6A00]">
+                <hoveredItem.icon className="h-4 w-4" />
+              </span>
+              <p className="text-sm font-semibold text-white">{hoveredItem.label}</p>
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-[#94A3B8]">{hoveredItem.description}</p>
+          </div>,
+          document.body
+        )}
     </aside>
   )
 }
