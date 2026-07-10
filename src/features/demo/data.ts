@@ -3,6 +3,7 @@ import type { ClientRecord } from '@/features/clients/data'
 import type { MessageItem, MessageThread } from '@/features/messages/types'
 import type { PaymentRecord } from '@/features/payments/types'
 import type { WorkoutPlan } from '@/features/workouts/data'
+import type { AvailabilitySlot, SessionRecord, SessionType } from '@/features/agenda/data'
 
 export const demoClientIds = {
   laura: '11111111-1111-4111-8111-111111111111',
@@ -687,4 +688,163 @@ export function isDemoCheckInId(id: string) {
 
 export function isDemoPaymentId(id: string) {
   return Object.values(demoPaymentIds).includes(id as (typeof demoPaymentIds)[keyof typeof demoPaymentIds])
+}
+
+const demoSessionTypeIds = {
+  entrenamiento: 'a1a1a1a1-a1a1-4a1a-8a1a-a1a1a1a1a1a1',
+  nutricion: 'b2b2b2b2-b2b2-4b2b-8b2b-b2b2b2b2b2b2',
+  fisioterapia: 'c3c3c3c3-c3c3-4c3c-8c3c-c3c3c3c3c3c3',
+} as const
+
+const demoSessionTypes: SessionType[] = [
+  { id: demoSessionTypeIds.entrenamiento, nombre: 'Entrenamiento personal', color: '#3B82F6' },
+  { id: demoSessionTypeIds.nutricion, nombre: 'Nutrición', color: '#FF6A00' },
+  { id: demoSessionTypeIds.fisioterapia, nombre: 'Fisioterapia', color: '#EC4899' },
+]
+
+function demoSessionDate(dayOffset: number, hour: number, minute = 0) {
+  const date = new Date()
+  date.setDate(date.getDate() + dayOffset)
+  date.setHours(hour, minute, 0, 0)
+  return date.toISOString()
+}
+
+const demoSessions: SessionRecord[] = [
+  {
+    id: 'session-demo-1',
+    clienteId: demoClientIds.laura,
+    clienteNombre: 'Laura Martín',
+    tipoSesionId: demoSessionTypeIds.entrenamiento,
+    tipoSesionNombre: 'Entrenamiento personal',
+    tipoSesionColor: '#3B82F6',
+    titulo: 'Revisión semanal',
+    modalidad: 'online',
+    fechaHora: demoSessionDate(0, 9, 30),
+    duracionMinutos: 45,
+    estado: 'programada',
+    origen: 'entrenador',
+    notas: null,
+  },
+  {
+    id: 'session-demo-2',
+    clienteId: demoClientIds.carlos,
+    clienteNombre: 'Carlos Ruiz',
+    tipoSesionId: demoSessionTypeIds.entrenamiento,
+    tipoSesionNombre: 'Entrenamiento personal',
+    tipoSesionColor: '#3B82F6',
+    titulo: 'Sesión presencial',
+    modalidad: 'presencial',
+    fechaHora: demoSessionDate(0, 11, 0),
+    duracionMinutos: 60,
+    estado: 'programada',
+    origen: 'entrenador',
+    notas: null,
+  },
+  {
+    id: 'session-demo-3',
+    clienteId: demoClientIds.marta,
+    clienteNombre: 'Marta Vega',
+    tipoSesionId: demoSessionTypeIds.entrenamiento,
+    tipoSesionNombre: 'Entrenamiento personal',
+    tipoSesionColor: '#3B82F6',
+    titulo: 'Onboarding',
+    modalidad: 'online',
+    fechaHora: demoSessionDate(0, 16, 30),
+    duracionMinutos: 30,
+    estado: 'programada',
+    origen: 'cliente',
+    notas: null,
+  },
+  {
+    id: 'session-demo-4',
+    clienteId: demoClientIds.javier,
+    clienteNombre: 'Javier Molina',
+    tipoSesionId: demoSessionTypeIds.fisioterapia,
+    tipoSesionNombre: 'Fisioterapia',
+    tipoSesionColor: '#EC4899',
+    titulo: 'Revisión rodilla',
+    modalidad: 'presencial',
+    fechaHora: demoSessionDate(2, 10, 0),
+    duracionMinutos: 45,
+    estado: 'programada',
+    origen: 'entrenador',
+    notas: null,
+  },
+  {
+    id: 'session-demo-5',
+    clienteId: demoClientIds.diego,
+    clienteNombre: 'Diego Núñez',
+    tipoSesionId: demoSessionTypeIds.nutricion,
+    tipoSesionNombre: 'Nutrición',
+    tipoSesionColor: '#FF6A00',
+    titulo: 'Revisión nutricional',
+    modalidad: 'online',
+    fechaHora: demoSessionDate(3, 18, 0),
+    duracionMinutos: 30,
+    estado: 'programada',
+    origen: 'cliente',
+    notas: null,
+  },
+  {
+    id: 'session-demo-6',
+    clienteId: demoClientIds.laura,
+    clienteNombre: 'Laura Martín',
+    tipoSesionId: demoSessionTypeIds.entrenamiento,
+    tipoSesionNombre: 'Entrenamiento personal',
+    tipoSesionColor: '#3B82F6',
+    titulo: 'Fuerza torso',
+    modalidad: 'presencial',
+    fechaHora: demoSessionDate(-2, 9, 0),
+    duracionMinutos: 60,
+    estado: 'completada',
+    origen: 'entrenador',
+    notas: null,
+  },
+  {
+    id: 'session-demo-7',
+    clienteId: demoClientIds.ana,
+    clienteNombre: 'Ana Torres',
+    tipoSesionId: demoSessionTypeIds.entrenamiento,
+    tipoSesionNombre: 'Entrenamiento personal',
+    tipoSesionColor: '#3B82F6',
+    titulo: 'Vuelta al ritmo',
+    modalidad: 'online',
+    fechaHora: demoSessionDate(-4, 17, 0),
+    duracionMinutos: 45,
+    estado: 'no_asistio',
+    origen: 'entrenador',
+    notas: null,
+  },
+]
+
+const demoAvailabilitySlots: AvailabilitySlot[] = [
+  { id: 'slot-demo-1', diaSemana: 0, horaInicio: '09:00', horaFin: '13:00', duracionSesionMinutos: 60, activo: true },
+  { id: 'slot-demo-2', diaSemana: 1, horaInicio: '16:00', horaFin: '20:00', duracionSesionMinutos: 45, activo: true },
+  { id: 'slot-demo-3', diaSemana: 3, horaInicio: '09:00', horaFin: '13:00', duracionSesionMinutos: 60, activo: true },
+]
+
+export function getDemoSessionTypes() {
+  return demoSessionTypes.map((type) => ({ ...type }))
+}
+
+export function getDemoSessions() {
+  return demoSessions.map((session) => ({ ...session }))
+}
+
+export function getDemoSessionsStats() {
+  const rows = demoSessions.filter((s) => s.estado !== 'cancelada')
+  const finished = rows.filter((s) => s.estado === 'completada' || s.estado === 'no_asistio')
+  const attended = rows.filter((s) => s.estado === 'completada')
+
+  return {
+    total: rows.length,
+    presenciales: rows.filter((s) => s.modalidad === 'presencial').length,
+    online: rows.filter((s) => s.modalidad === 'online').length,
+    asistenciaPct: finished.length ? Math.round((attended.length / finished.length) * 100) : 0,
+    reservas: rows.filter((s) => s.origen === 'cliente').length,
+  }
+}
+
+export function getDemoAvailabilitySlots() {
+  return demoAvailabilitySlots.map((slot) => ({ ...slot }))
 }

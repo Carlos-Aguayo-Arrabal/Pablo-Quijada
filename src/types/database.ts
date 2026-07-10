@@ -267,6 +267,47 @@ export type ResumenIa = {
   generado_en: string
 }
 
+export type TipoSesion = {
+  id: string
+  entrenador_id: string
+  nombre: string
+  color: string
+  creado_en: string
+  actualizado_en: string
+}
+
+export type FranjaHorario = {
+  id: string
+  entrenador_id: string
+  dia_semana: number
+  hora_inicio: string
+  hora_fin: string
+  duracion_sesion_minutos: number
+  activo: boolean
+  creado_en: string
+  actualizado_en: string
+}
+
+export type SesionModalidad = 'presencial' | 'online'
+export type SesionEstado = 'programada' | 'completada' | 'cancelada' | 'no_asistio'
+export type SesionOrigen = 'entrenador' | 'cliente'
+
+export type Sesion = {
+  id: string
+  entrenador_id: string
+  cliente_id: string
+  tipo_sesion_id: string | null
+  titulo: string
+  modalidad: SesionModalidad
+  fecha_hora: string
+  duracion_minutos: number
+  estado: SesionEstado
+  origen: SesionOrigen
+  notas: string | null
+  creado_en: string
+  actualizado_en: string
+}
+
 export type Program = Programa
 export type Phase = FasePrograma
 export type Week = SemanaPrograma
@@ -496,6 +537,40 @@ export interface Database {
             foreignKeyName: 'resumenes_ia_cliente_id_fkey'
             columns: ['cliente_id']
             referencedRelation: 'clientes'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      tipos_sesion: {
+        Row: TipoSesion
+        Insert: Pick<TipoSesion, 'entrenador_id' | 'nombre'> &
+          Partial<Omit<TipoSesion, 'id' | 'entrenador_id' | 'nombre' | 'creado_en' | 'actualizado_en'>>
+        Update: Partial<Omit<TipoSesion, 'id' | 'creado_en'>>
+        Relationships: []
+      }
+      franjas_horario: {
+        Row: FranjaHorario
+        Insert: Pick<FranjaHorario, 'entrenador_id' | 'dia_semana' | 'hora_inicio' | 'hora_fin'> &
+          Partial<Omit<FranjaHorario, 'id' | 'entrenador_id' | 'dia_semana' | 'hora_inicio' | 'hora_fin' | 'creado_en' | 'actualizado_en'>>
+        Update: Partial<Omit<FranjaHorario, 'id' | 'creado_en'>>
+        Relationships: []
+      }
+      sesiones: {
+        Row: Sesion
+        Insert: Pick<Sesion, 'entrenador_id' | 'cliente_id' | 'titulo' | 'modalidad' | 'fecha_hora'> &
+          Partial<Omit<Sesion, 'id' | 'entrenador_id' | 'cliente_id' | 'titulo' | 'modalidad' | 'fecha_hora' | 'creado_en' | 'actualizado_en'>>
+        Update: Partial<Omit<Sesion, 'id' | 'creado_en'>>
+        Relationships: [
+          {
+            foreignKeyName: 'sesiones_cliente_id_fkey'
+            columns: ['cliente_id']
+            referencedRelation: 'clientes'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'sesiones_tipo_sesion_id_fkey'
+            columns: ['tipo_sesion_id']
+            referencedRelation: 'tipos_sesion'
             referencedColumns: ['id']
           },
         ]

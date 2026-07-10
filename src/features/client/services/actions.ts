@@ -4,8 +4,15 @@ import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { isDemoClientSession, setDemoClientSession } from '@/features/demo/server'
-import { getDemoMessages, getDemoPlan, getDemoProfile } from '@/features/client/demo-data'
-import type { ClientPlan, ClientPlanExercise, MyMessage, MyProfile } from '@/features/client/types'
+import {
+  getDemoAvailableSlots,
+  getDemoMessages,
+  getDemoMySessions,
+  getDemoPlan,
+  getDemoProfile,
+} from '@/features/client/demo-data'
+import { jsDayToDiaSemana } from '@/features/agenda/data'
+import type { AvailableSlot, ClientPlan, ClientPlanExercise, MyMessage, MyProfile, MySession } from '@/features/client/types'
 
 const signupClientSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -256,6 +263,164 @@ export async function sendMyMessage(contenido: string) {
     remitente: 'cliente',
     contenido: trimmed,
   })
+
+  if (error) return { error: error.message }
+
+  revalidatePath('/client')
+  return { success: true }
+}
+
+// ---------- Reserva de citas ----------
+
+export async function listAvailableSlots(): Promise<AvailableSlot[]> {
+  if (await isDemoClientSession()) return getDemoAvailableSlots()
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
+  const { data: clienteRow } = await supabase
+    .from('clientes')
+    .select('id, entrenador_id')
+    .eq('user_id', user.id)
+    .maybeSingle()
+  if (!clienteRow) return []
+
+  const { data: franjas } = await supabase
+    .from('franjas_horario')
+    .select('dia_semana, hora_inicio, hora_fin, duracion_sesion_minutos')
+    .eq('entrenador_id', clienteRow.entrenador_id)
+    .eq('activo', true)
+  if (!franjas || franjas.length === 0) return []
+
+  const now = new Date()
+  const horizonEnd = new Date(now)
+  horizonEnd.setDate(horizonEnd.getDate() + 21)
+
+  const { data: existingSessions } = await supabase
+    .from('sesiones')
+    .select('fecha_hora')
+    .eq('entrenador_id', clienteRow.entrenador_id)
+    .eq('estado', 'programada')
+    .gte('fecha_hora', now.toISOString())
+    .lte('fecha_hora', horizonEnd.toISOString())
+
+  // Comparar por timestamp, no por string: Postgres y JS no siempre serializan
+  // el mismo instante con el mismo formato ISO (offset vs. "Z", milisegundos...).
+  const occupied = new Set((existingSessions ?? []).map((s) => new Date(s.fecha_hora).getTime()))
+
+  const slots: AvailableSlot[] = []
+
+  for (let dayOffset = 0; dayOffset < 21; dayOffset++) {
+    const date = new Date(now)
+    date.setDate(date.getDate() + dayOffset)
+    const diaSemana = jsDayToDiaSemana(date.getDay())
+    const dayFranjas = franjas.filter((f) => f.dia_semana === diaSemana)
+
+    for (const franja of dayFranjas) {
+      const [startH, startM] = franja.hora_inicio.split(':').map(Number)
+      const [endH, endM] = franja.hora_fin.split(':').map(Number)
+      const duracion = franja.duracion_sesion_minutos
+
+      const cursor = new Date(date)
+      cursor.setHours(startH, startM, 0, 0)
+      const franjaEnd = new Date(date)
+      franjaEnd.setHours(endH, endM, 0, 0)
+
+      while (cursor.getTime() + duracion * 60_000 <= franjaEnd.getTime()) {
+        if (cursor.getTime() > now.getTime() && !occupied.has(cursor.getTime())) {
+          slots.push({ fechaHora: cursor.toISOString(), duracionMinutos: duracion })
+        }
+        cursor.setMinutes(cursor.getMinutes() + duracion)
+      }
+    }
+  }
+
+  return slots.sort((a, b) => a.fechaHora.localeCompare(b.fechaHora))
+}
+
+const bookSessionSchema = z.object({
+  fechaHora: z.string().min(10),
+  duracionMinutos: z.number().min(5),
+  modalidad: z.enum(['presencial', 'online']),
+})
+
+export async function bookSession(input: { fechaHora: string; duracionMinutos: number; modalidad: 'presencial' | 'online' }) {
+  const parsed = bookSessionSchema.safeParse(input)
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Datos inválidos' }
+
+  if (await isDemoClientSession()) return { success: true }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'No autenticado' }
+
+  const { data: clienteRow } = await supabase
+    .from('clientes')
+    .select('id, entrenador_id')
+    .eq('user_id', user.id)
+    .maybeSingle()
+  if (!clienteRow) return { error: 'No se encontró tu ficha de cliente' }
+
+  // check-then-act: evita reservar un hueco que se acaba de ocupar
+  const { data: clash } = await supabase
+    .from('sesiones')
+    .select('id')
+    .eq('entrenador_id', clienteRow.entrenador_id)
+    .eq('fecha_hora', parsed.data.fechaHora)
+    .eq('estado', 'programada')
+    .maybeSingle()
+  if (clash) return { error: 'Ese hueco ya no está disponible, elige otro' }
+
+  const { error: insertError } = await supabase.from('sesiones').insert({
+    entrenador_id: clienteRow.entrenador_id,
+    cliente_id: clienteRow.id,
+    titulo: 'Cita reservada',
+    modalidad: parsed.data.modalidad,
+    fecha_hora: parsed.data.fechaHora,
+    duracion_minutos: parsed.data.duracionMinutos,
+    origen: 'cliente',
+  })
+
+  if (insertError) return { error: insertError.message }
+
+  revalidatePath('/client')
+  return { success: true }
+}
+
+export async function listMySessions(): Promise<MySession[]> {
+  if (await isDemoClientSession()) return getDemoMySessions()
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
+  const { data: clienteRow } = await supabase.from('clientes').select('id').eq('user_id', user.id).maybeSingle()
+  if (!clienteRow) return []
+
+  const { data } = await supabase
+    .from('sesiones')
+    .select('id, titulo, fecha_hora, duracion_minutos, modalidad, estado')
+    .eq('cliente_id', clienteRow.id)
+    .neq('estado', 'cancelada')
+    .gte('fecha_hora', new Date().toISOString())
+    .order('fecha_hora', { ascending: true })
+
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    titulo: row.titulo,
+    fechaHora: row.fecha_hora,
+    duracionMinutos: row.duracion_minutos,
+    modalidad: row.modalidad,
+    estado: row.estado,
+  }))
+}
+
+export async function cancelMySession(id: string) {
+  if (await isDemoClientSession()) return { success: true }
+
+  const supabase = await createClient()
+  const { error } = await supabase.from('sesiones').update({ estado: 'cancelada' }).eq('id', id)
 
   if (error) return { error: error.message }
 

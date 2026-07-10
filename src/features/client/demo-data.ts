@@ -1,4 +1,4 @@
-import type { ClientPlan, MyMessage, MyProfile } from '@/features/client/types'
+import type { AvailableSlot, ClientPlan, MyMessage, MyProfile, MySession } from '@/features/client/types'
 
 export function getDemoProfile(): MyProfile {
   return { nombre: 'Laura', email: 'laura@cliente.demo', adherencia: 91, pesoActual: '78.4' }
@@ -71,3 +71,35 @@ export const DEMO_MEALS = [
   { name: 'Comida', content: 'Arroz, pollo, verduras y aceite de oliva', macros: '710 kcal · 52P / 82C / 18G' },
   { name: 'Cena', content: 'Salmón, patata cocida y ensalada grande', macros: '640 kcal · 46P / 50C / 24G' },
 ] as const
+
+export function getDemoAvailableSlots(): AvailableSlot[] {
+  const now = new Date()
+  const slots: AvailableSlot[] = []
+
+  for (const [dayOffset, hour] of [[1, 9], [1, 10], [2, 16], [3, 9], [4, 17]] as const) {
+    const date = new Date(now)
+    date.setDate(date.getDate() + dayOffset)
+    date.setHours(hour, 0, 0, 0)
+    slots.push({ fechaHora: date.toISOString(), duracionMinutos: 60 })
+  }
+
+  return slots
+}
+
+export function getDemoMySessions(): MySession[] {
+  const now = new Date()
+  const next = new Date(now)
+  next.setDate(next.getDate() + 5)
+  next.setHours(10, 0, 0, 0)
+
+  return [
+    {
+      id: 'demo-session-1',
+      titulo: 'Fuerza torso + core',
+      fechaHora: next.toISOString(),
+      duracionMinutos: 60,
+      modalidad: 'presencial',
+      estado: 'programada',
+    },
+  ]
+}

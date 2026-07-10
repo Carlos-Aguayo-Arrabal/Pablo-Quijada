@@ -27,3 +27,17 @@ export type MyMessage = {
   contenido: string
   creadoEn: string
 }
+
+export type AvailableSlot = {
+  fechaHora: string
+  duracionMinutos: number
+}
+
+export type MySession = {
+  id: string
+  titulo: string
+  fechaHora: string
+  duracionMinutos: number
+  modalidad: 'presencial' | 'online'
+  estado: 'programada' | 'completada' | 'cancelada' | 'no_asistio'
+}

@@ -9,7 +9,8 @@ import { HabitsPanel, NutritionPanel } from '@/features/client/components/habits
 import { CheckinForm } from '@/features/client/components/checkin-form'
 import { CoachChat } from '@/features/client/components/coach-chat'
 import { WellnessForm } from '@/features/wellness/components/wellness-form'
-import type { ClientPlan, MyMessage, MyProfile } from '@/features/client/types'
+import { BookSessionPanel } from '@/features/client/components/book-session-panel'
+import type { AvailableSlot, ClientPlan, MyMessage, MyProfile, MySession } from '@/features/client/types'
 
 function initialsFor(name: string) {
   return name
@@ -24,10 +25,19 @@ interface ClientPortalViewProps {
   profile: MyProfile
   plan: ClientPlan
   initialMessages: MyMessage[]
+  availableSlots: AvailableSlot[]
+  mySessions: MySession[]
   isDemo: boolean
 }
 
-export function ClientPortalView({ profile, plan, initialMessages, isDemo }: ClientPortalViewProps) {
+export function ClientPortalView({
+  profile,
+  plan,
+  initialMessages,
+  availableSlots,
+  mySessions,
+  isDemo,
+}: ClientPortalViewProps) {
   return (
     <div className="min-h-screen bg-[#080C14] text-white">
       <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#080C14]/90 backdrop-blur-xl">
@@ -94,6 +104,7 @@ export function ClientPortalView({ profile, plan, initialMessages, isDemo }: Cli
           </div>
 
           <div className="space-y-6">
+            <BookSessionPanel initialSlots={availableSlots} initialMySessions={mySessions} />
             <HabitsPanel />
             <CheckinForm pesoActual={profile.pesoActual} />
             <WellnessForm />
