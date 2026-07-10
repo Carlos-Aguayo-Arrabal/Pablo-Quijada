@@ -3,6 +3,8 @@ import { WorkspaceActions } from '@/shared/components/workspace-actions'
 import { PWARegister } from '@/shared/components/pwa-register'
 import { PushNotificationPrompt } from '@/features/notifications/components/push-notification-prompt'
 import { listNotifications } from '@/features/notifications/services/actions'
+import { OnboardingWidget } from '@/features/onboarding/components/onboarding-widget'
+import { getOnboardingStatus } from '@/features/onboarding/services/actions'
 import { createClient } from '@/lib/supabase/server'
 import { DEMO_USER } from '@/features/demo/auth'
 import { isDemoSession } from '@/features/demo/server'
@@ -26,6 +28,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
   }
 
   const notifications = user && !demoSession ? await listNotifications() : undefined
+  const onboardingStatus = user && !demoSession ? await getOnboardingStatus() : null
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#080C14]">
@@ -74,6 +77,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
 
       <PWARegister />
       {user && !demoSession && <PushNotificationPrompt userId={user.id} />}
+      {user && !demoSession && <OnboardingWidget initialStatus={onboardingStatus} />}
     </div>
   )
 }

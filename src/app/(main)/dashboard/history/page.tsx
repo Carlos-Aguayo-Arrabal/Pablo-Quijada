@@ -22,7 +22,14 @@ function startOfCalendarGrid(monthDate: Date) {
   return start
 }
 
-export default async function HistoryPage() {
+export default async function HistoryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>
+}) {
+  const { tab } = await searchParams
+  const initialTab = tab === 'horario' ? ('Horario de citas' as const) : undefined
+
   const now = new Date()
   const from = startOfCalendarGrid(now)
   const to = new Date(from)
@@ -57,6 +64,7 @@ export default async function HistoryPage() {
         sessionTypes={sessionTypes}
         availability={availability}
         clients={clients.map((c) => ({ id: c.id, name: c.name }))}
+        initialTab={initialTab}
       />
     </div>
   )

@@ -20,6 +20,7 @@ interface AgendaTabsProps {
   sessionTypes: SessionType[]
   availability: AvailabilitySlot[]
   clients: { id: string; name: string }[]
+  initialTab?: AgendaTab
 }
 
 export function AgendaTabs({
@@ -30,8 +31,9 @@ export function AgendaTabs({
   sessionTypes,
   availability,
   clients,
+  initialTab,
 }: AgendaTabsProps) {
-  const [activeTab, setActiveTab] = useState<AgendaTab>('Calendario')
+  const [activeTab, setActiveTab] = useState<AgendaTab>(initialTab ?? 'Calendario')
 
   return (
     <div className="space-y-5">

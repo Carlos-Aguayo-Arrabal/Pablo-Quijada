@@ -308,6 +308,14 @@ export type Sesion = {
   actualizado_en: string
 }
 
+export type OnboardingEstado = {
+  entrenador_id: string
+  descartado: boolean
+  descartado_en: string | null
+  creado_en: string
+  actualizado_en: string
+}
+
 export type Program = Programa
 export type Phase = FasePrograma
 export type Week = SemanaPrograma
@@ -574,6 +582,12 @@ export interface Database {
             referencedColumns: ['id']
           },
         ]
+      }
+      onboarding_estado: {
+        Row: OnboardingEstado
+        Insert: Pick<OnboardingEstado, 'entrenador_id'> & Partial<Omit<OnboardingEstado, 'entrenador_id' | 'creado_en' | 'actualizado_en'>>
+        Update: Partial<Omit<OnboardingEstado, 'entrenador_id' | 'creado_en'>>
+        Relationships: []
       }
     }
     Views: Record<string, never>
