@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -24,46 +25,55 @@ const navItems = [
     label: 'Dashboard',
     href: '/dashboard',
     icon: LayoutDashboard,
+    description: 'Resumen operativo del día: check-ins, mensajes y planes que necesitan atención.',
   },
   {
     label: 'Clientes',
     href: '/dashboard/clients',
     icon: User,
+    description: 'Cartera de clientes: adherencia, pagos, riesgos y próxima acción de cada uno.',
   },
   {
     label: 'Planes',
     href: '/dashboard/workouts',
     icon: ClipboardList,
+    description: 'Crea y gestiona rutinas de entrenamiento para asignar a tus clientes.',
   },
   {
     label: 'Ejercicios',
     href: '/dashboard/exercises',
     icon: Dumbbell,
+    description: 'Tu catálogo de ejercicios: patrón de movimiento, equipamiento y lateralidad.',
   },
   {
     label: 'Check-ins',
     href: '/dashboard/checkins',
     icon: ClipboardCheck,
+    description: 'Revisa y aprueba los check-ins que te envían tus clientes.',
   },
   {
     label: 'Agenda',
     href: '/dashboard/history',
     icon: History,
+    description: 'Historial de actividad y seguimiento de tu negocio de coaching.',
   },
   {
     label: 'Pagos',
     href: '/dashboard/payments',
     icon: BadgeEuro,
+    description: 'Controla ingresos, renovaciones y pagos pendientes de cada cliente.',
   },
   {
     label: 'Mensajes',
     href: '/dashboard/messages',
     icon: MessageSquare,
+    description: 'Conversaciones con tus clientes, con contexto de su plan y progreso.',
   },
   {
     label: 'Perfil',
     href: '/dashboard/profile',
     icon: User,
+    description: 'Tu información personal y la de tu negocio de coaching.',
   },
 ]
 
@@ -85,6 +95,8 @@ export function Sidebar({
   userEmail = 'carlosaguayoarrabal2026@gmail.com',
 }: SidebarProps) {
   const pathname = usePathname()
+  const [hovered, setHovered] = useState<{ href: string; top: number } | null>(null)
+  const hoveredItem = hovered ? navItems.find((item) => item.href === hovered.href) : null
 
   return (
     <aside className="flex h-full w-64 flex-col border-r border-white/[0.06] bg-[#080C14]/80 backdrop-blur-xl">
@@ -106,6 +118,10 @@ export function Sidebar({
               <Link
                 key={item.href}
                 href={item.href}
+                onMouseEnter={(event) =>
+                  setHovered({ href: item.href, top: event.currentTarget.getBoundingClientRect().top })
+                }
+                onMouseLeave={() => setHovered((current) => (current?.href === item.href ? null : current))}
                 className={cn(
                   'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
                   isActive
@@ -186,6 +202,21 @@ export function Sidebar({
           </form>
         </div>
       </div>
+
+      {hoveredItem && (
+        <div
+          className="pointer-events-none fixed z-50 w-64 rounded-xl border border-white/10 bg-[#0D1421] p-4 shadow-2xl shadow-black/40"
+          style={{ left: '17rem', top: hoveredItem && hovered ? hovered.top : 0 }}
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#FF6A00]/15 text-[#FF6A00]">
+              <hoveredItem.icon className="h-4 w-4" />
+            </span>
+            <p className="text-sm font-semibold text-white">{hoveredItem.label}</p>
+          </div>
+          <p className="mt-2 text-xs leading-relaxed text-[#94A3B8]">{hoveredItem.description}</p>
+        </div>
+      )}
     </aside>
   )
 }
