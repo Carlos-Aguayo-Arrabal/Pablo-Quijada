@@ -41,7 +41,7 @@ export function ClientPortalView({
   return (
     <div className="min-h-screen bg-[#080C14] text-white">
       <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#080C14]/90 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-6">
           <div className="min-w-0">
             <div className="mb-1 inline-flex items-center gap-2 rounded-full border border-[#FFB000]/25 bg-[#FFB000]/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-[#FFB000]">
               Portal cliente
@@ -49,7 +49,7 @@ export function ClientPortalView({
             <h1 className="truncate text-lg font-bold">Hola, {profile.nombre}</h1>
             <p className="truncate text-xs text-[#94A3B8]">Vista de entrenamientos, hábitos y comunicación con tu entrenador.</p>
           </div>
-          <div className="flex min-w-0 items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <WorkspaceActions mode="client" userName={profile.nombre} userEmail={profile.email} compact />
             <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#FF6A00]/30 to-[#FFB000]/30 text-sm font-bold sm:flex">
               {initialsFor(profile.nombre)}
@@ -77,7 +77,7 @@ export function ClientPortalView({
               <h2 className="text-sm font-semibold">Resumen</h2>
               <Activity className="h-4 w-4 text-[#FF6A00]" />
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <div className="mb-1.5 flex items-center justify-between text-xs">
                   <span className="text-[#94A3B8]">Adherencia</span>
@@ -97,7 +97,7 @@ export function ClientPortalView({
           </div>
         </section>
 
-        <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+        <section className="grid grid-cols-1 gap-6 lg:grid-cols-[1.15fr_0.85fr]">
           <div className="space-y-6">
             <TodayWorkoutPanel plan={plan} />
             <NutritionPanel />

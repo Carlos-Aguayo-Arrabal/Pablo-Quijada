@@ -102,7 +102,7 @@ export function WorkspaceActions({
   }
 
   return (
-    <div className="relative flex min-w-0 items-center gap-3">
+    <div className="relative flex shrink-0 items-center gap-2 sm:gap-3">
       <div className={cn(
         'hidden min-w-0 items-center gap-3 rounded-2xl border px-3 py-2 md:flex',
         copy.tone,

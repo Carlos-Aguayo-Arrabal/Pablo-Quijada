@@ -71,7 +71,7 @@ export function TodayWorkoutPanel({ plan }: { plan: ClientPlan }) {
           </div>
         )}
         {exercises.length > 0 && (
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             {[
               { icon: Clock, label: 'Ejercicios', value: `${exercises.length}` },
               { icon: Flame, label: 'Series totales', value: `${exercises.reduce((sum, e) => sum + e.sets, 0)}` },
@@ -134,7 +134,7 @@ export function TodayWorkoutPanel({ plan }: { plan: ClientPlan }) {
                           Ver técnica
                         </button>
                       </div>
-                      <div className="mt-3 grid gap-2 text-xs text-[#94A3B8] sm:grid-cols-3">
+                      <div className="mt-3 grid grid-cols-1 gap-2 text-xs text-[#94A3B8] sm:grid-cols-3">
                         <span>{exercise.sets} series</span>
                         <span>
                           {exercise.repsLabel}
@@ -143,7 +143,7 @@ export function TodayWorkoutPanel({ plan }: { plan: ClientPlan }) {
                         <span>{exercise.restSeconds}s descanso</span>
                       </div>
                       <ExerciseTimer key={exercise.id} exercise={exercise} />
-                      <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
                         <label className="block">
                           <span className="mb-1 block text-[11px] text-[#475569]">Carga usada</span>
                           <input

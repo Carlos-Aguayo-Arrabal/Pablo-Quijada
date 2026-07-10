@@ -57,7 +57,7 @@ export function NutritionPanel() {
         <Utensils className="h-4 w-4 text-[#FB923C]" />
         <h2 className="text-sm font-semibold">Plan nutricional de hoy</h2>
       </div>
-      <div className="grid gap-3 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         {DEMO_MEALS.map((meal) => (
           <div key={meal.name} className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4">
             <p className="text-sm font-semibold text-white">{meal.name}</p>
