@@ -596,6 +596,10 @@ export interface Database {
         Args: Record<string, never>
         Returns: Cliente
       }
+      touch_client_last_seen: {
+        Args: Record<string, never>
+        Returns: void
+      }
     }
     Enums: Record<string, never>
     CompositeTypes: Record<string, never>

@@ -79,6 +79,8 @@ export async function getMyProfile(): Promise<MyProfile> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { nombre: 'Cliente', email: '', adherencia: 0, pesoActual: null }
 
+  void supabase.rpc('touch_client_last_seen')
+
   const { data: clienteRow } = await supabase
     .from('clientes')
     .select('nombre, email, adherencia, peso')
