@@ -15,7 +15,6 @@ import {
 } from 'lucide-react'
 import { Navbar } from '@/shared/components/navbar'
 import { GradientBackground } from '@/shared/components/gradient-background'
-import { HeroDemoLink } from '@/shared/components/hero-demo-link'
 
 export const metadata: Metadata = {
   title: 'TrainTools — Gestiona tu negocio fitness',
@@ -110,10 +109,6 @@ export default function HomePage() {
               <Link href="/signup" className="btn-primary px-7 py-3.5 text-base">
                 Probar gratis
                 <ArrowRight className="h-4 w-4" />
-              </Link>
-              <HeroDemoLink className="btn-secondary px-7 py-3.5 text-base" />
-              <Link href="/client" className="btn-secondary px-7 py-3.5 text-base">
-                Ver demo cliente
               </Link>
             </div>
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-[#94A3B8]">
