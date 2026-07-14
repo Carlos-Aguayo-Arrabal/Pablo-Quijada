@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Bell, Check, Globe, Lock, Mail, Save, Shield, Smartphone } from 'lucide-react'
+import { Bell, BookOpen, Check, Globe, Lock, Mail, Save, Shield, Smartphone } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
+import { updateHelpResources } from '@/features/settings/services/actions'
 
 const notificationOptions = [
   { id: 'checkins', label: 'Avisos de check-ins', detail: 'Recibe una alerta cuando un cliente complete su revisión.' },
@@ -10,12 +11,33 @@ const notificationOptions = [
   { id: 'messages', label: 'Mensajes sin responder', detail: 'Resumen de conversaciones pendientes al final del día.' },
 ]
 
-export function SettingsPanel() {
+interface SettingsPanelProps {
+  initialHelpResources: { manualUrl: string | null; videoUrl: string | null }
+}
+
+export function SettingsPanel({ initialHelpResources }: SettingsPanelProps) {
   const [saved, setSaved] = useState(false)
   const [securityMessage, setSecurityMessage] = useState('')
   const [notifications, setNotifications] = useState(() => new Set(['checkins', 'payments']))
   const [timezone, setTimezone] = useState('Europe/Madrid')
   const [language, setLanguage] = useState('es')
+
+  const [manualUrl, setManualUrl] = useState(initialHelpResources.manualUrl ?? '')
+  const [videoUrl, setVideoUrl] = useState(initialHelpResources.videoUrl ?? '')
+  const [resourcesStatus, setResourcesStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [resourcesError, setResourcesError] = useState<string | null>(null)
+
+  async function handleSaveResources() {
+    setResourcesStatus('saving')
+    setResourcesError(null)
+    const result = await updateHelpResources({ manualUrl, videoUrl })
+    if (result.error) {
+      setResourcesStatus('error')
+      setResourcesError(result.error)
+      return
+    }
+    setResourcesStatus('saved')
+  }
 
   function toggleNotification(id: string) {
     setSaved(false)
@@ -86,6 +108,57 @@ export function SettingsPanel() {
             {securityMessage && (
               <p className="mt-3 rounded-xl border border-[#FFB000]/25 bg-[#FFB000]/10 px-3 py-2 text-xs text-[#DDE2FF]">
                 {securityMessage}
+              </p>
+            )}
+          </div>
+
+          <div className="glass-card rounded-2xl p-5">
+            <div className="mb-4 flex items-center gap-2">
+              <BookOpen className="h-4 w-4 text-[#FF6A00]" />
+              <h2 className="text-sm font-semibold text-white">Recursos de ayuda</h2>
+            </div>
+            <p className="mb-4 text-xs text-[#94A3B8]">
+              Estos enlaces aparecen en la pantalla de inicio de sesión para tus clientes y tu equipo.
+            </p>
+            <div className="space-y-4">
+              <label className="block">
+                <span className="mb-1.5 block text-xs text-[#94A3B8]">Manual de usuario (PDF)</span>
+                <input
+                  type="url"
+                  value={manualUrl}
+                  onChange={(event) => { setManualUrl(event.target.value); setResourcesStatus('idle') }}
+                  placeholder="https://..."
+                  className="input-field"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1.5 block text-xs text-[#94A3B8]">Video tutorial</span>
+                <input
+                  type="url"
+                  value={videoUrl}
+                  onChange={(event) => { setVideoUrl(event.target.value); setResourcesStatus('idle') }}
+                  placeholder="https://youtube.com/..."
+                  className="input-field"
+                />
+              </label>
+            </div>
+            <button
+              type="button"
+              onClick={handleSaveResources}
+              disabled={resourcesStatus === 'saving'}
+              className="btn-primary mt-4 w-full justify-center px-4 py-2 text-xs disabled:opacity-60"
+            >
+              <Save className="h-4 w-4" />
+              {resourcesStatus === 'saving' ? 'Guardando...' : 'Guardar recursos'}
+            </button>
+            {resourcesStatus === 'saved' && (
+              <p className="mt-3 rounded-xl border border-[#FF6A00]/25 bg-[#FF6A00]/10 px-3 py-2 text-xs text-[#FF6A00]">
+                Enlaces guardados. Ya se muestran en el login.
+              </p>
+            )}
+            {resourcesStatus === 'error' && resourcesError && (
+              <p className="mt-3 rounded-xl border border-[#F87171]/30 bg-[#F87171]/10 px-3 py-2 text-xs text-[#F87171]">
+                {resourcesError}
               </p>
             )}
           </div>

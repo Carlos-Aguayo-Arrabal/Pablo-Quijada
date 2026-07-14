@@ -6,11 +6,10 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Eye, EyeOff, ArrowRight, Loader2, ShieldCheck } from 'lucide-react'
+import { Eye, EyeOff, ArrowRight, FileText, Loader2, PlayCircle } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { login } from '@/actions/auth'
 import { createClient } from '@/lib/supabase/client'
-import { DEMO_CREDENTIALS } from '@/features/demo/auth'
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -21,13 +20,14 @@ type LoginFormData = z.infer<typeof loginSchema>
 
 interface LoginFormProps {
   redirectTo?: string
+  manualUrl?: string | null
+  videoUrl?: string | null
 }
 
-export function LoginForm({ redirectTo = '/dashboard' }: LoginFormProps) {
+export function LoginForm({ redirectTo = '/dashboard', manualUrl, videoUrl }: LoginFormProps) {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [isDemoLoading, setIsDemoLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const {
@@ -53,22 +53,6 @@ export function LoginForm({ redirectTo = '/dashboard' }: LoginFormProps) {
     // Un cliente siempre va a /client, sin importar el redirectTo solicitado
     // (deep link de un entrenador). El resto respeta el redirectTo pedido.
     router.push(result.redirectTo === '/client' ? '/client' : redirectTo)
-    router.refresh()
-  }
-
-  const handleDemoLogin = async () => {
-    setIsDemoLoading(true)
-    setError(null)
-
-    const result = await login(DEMO_CREDENTIALS.email, DEMO_CREDENTIALS.password)
-
-    if (result.error) {
-      setError(result.error)
-      setIsDemoLoading(false)
-      return
-    }
-
-    router.push(redirectTo)
     router.refresh()
   }
 
@@ -168,7 +152,7 @@ export function LoginForm({ redirectTo = '/dashboard' }: LoginFormProps) {
       {/* Submit */}
       <button
         type="submit"
-        disabled={isLoading || isDemoLoading}
+        disabled={isLoading}
         className="btn-primary w-full justify-center py-3 text-sm disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:transform-none"
         id="login-submit"
       >
@@ -184,36 +168,6 @@ export function LoginForm({ redirectTo = '/dashboard' }: LoginFormProps) {
           </>
         )}
       </button>
-
-      <button
-        type="button"
-        onClick={handleDemoLogin}
-        disabled={isLoading || isDemoLoading}
-        className="btn-secondary w-full justify-center py-3 text-sm disabled:cursor-not-allowed disabled:opacity-60"
-        id="login-demo"
-      >
-        {isDemoLoading ? (
-          <>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Abriendo demo...
-          </>
-        ) : (
-          <>
-            <ShieldCheck className="h-4 w-4" />
-            Entrar a demo completa
-          </>
-        )}
-      </button>
-
-      <div className="rounded-xl border border-[#FF6A00]/20 bg-[#FF6A00]/10 px-4 py-3 text-xs text-[#C8D2E3]">
-        <p className="font-bold text-white">Acceso demo total</p>
-        <p className="mt-1">
-          Email: <span className="font-mono text-[#FFB000]">{DEMO_CREDENTIALS.email}</span>
-        </p>
-        <p>
-          Contraseña: <span className="font-mono text-[#FFB000]">{DEMO_CREDENTIALS.password}</span>
-        </p>
-      </div>
 
       {/* Divider */}
       <div className="relative flex items-center gap-3 py-1">
@@ -246,6 +200,34 @@ export function LoginForm({ redirectTo = '/dashboard' }: LoginFormProps) {
           Regístrate gratis
         </Link>
       </p>
+
+      {/* Recursos de ayuda: configurables en Configuración > Recursos de ayuda */}
+      <div className="flex flex-col items-center gap-2 border-t border-white/[0.06] pt-4">
+        <Link
+          href={manualUrl || '#'}
+          target={manualUrl ? '_blank' : undefined}
+          rel={manualUrl ? 'noopener noreferrer' : undefined}
+          className={cn(
+            'flex items-center gap-2 text-xs text-[#94A3B8] hover:text-white transition-colors',
+            !manualUrl && 'pointer-events-none opacity-50'
+          )}
+        >
+          <FileText className="h-3.5 w-3.5" />
+          Manuales de usuario (PDF)
+        </Link>
+        <Link
+          href={videoUrl || '#'}
+          target={videoUrl ? '_blank' : undefined}
+          rel={videoUrl ? 'noopener noreferrer' : undefined}
+          className={cn(
+            'flex items-center gap-2 text-xs text-[#94A3B8] hover:text-white transition-colors',
+            !videoUrl && 'pointer-events-none opacity-50'
+          )}
+        >
+          <PlayCircle className="h-3.5 w-3.5" />
+          Video tutoriales
+        </Link>
+      </div>
     </form>
   )
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { LoginForm } from '@/features/auth/components/login-form'
+import { getHelpResources } from '@/features/settings/services/actions'
 
 export const metadata: Metadata = {
   title: 'Iniciar sesión',
@@ -23,6 +24,7 @@ export default async function AuthLoginPage({
 }) {
   const { redirect } = await params
   const redirectTo = decodeRedirect(redirect)
+  const helpResources = await getHelpResources()
 
   return (
     <div>
@@ -35,7 +37,7 @@ export default async function AuthLoginPage({
           Inicia sesión para continuar hacia {redirectTo}.
         </p>
       </div>
-      <LoginForm redirectTo={redirectTo} />
+      <LoginForm redirectTo={redirectTo} manualUrl={helpResources.manualUrl} videoUrl={helpResources.videoUrl} />
     </div>
   )
 }

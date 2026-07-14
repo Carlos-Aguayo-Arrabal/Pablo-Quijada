@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import { CookieConsentBanner } from '@/shared/components/cookie-consent-banner'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -48,6 +49,7 @@ export default function RootLayout({
     <html lang="es" className="dark">
       <body className="antialiased">
         {children}
+        <CookieConsentBanner />
       </body>
     </html>
   )
