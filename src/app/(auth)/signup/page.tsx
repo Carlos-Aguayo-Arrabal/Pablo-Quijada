@@ -10,9 +10,9 @@ export default function SignupPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white">Prueba TrainTools gratis</h1>
+        <h1 className="text-2xl font-bold text-white">Prueba TrainTools 1 mes gratis</h1>
         <p className="mt-1.5 text-sm text-[#94A3B8]">
-          Crea tu espacio profesional y empieza con tus primeros clientes
+          Crea tu espacio profesional y empieza con tus primeros clientes. Sin tarjeta.
         </p>
       </div>
       <SignupForm />

@@ -107,12 +107,12 @@ export default function HomePage() {
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link href="/signup" className="btn-primary px-7 py-3.5 text-base">
-                Probar gratis
+                Prueba gratis 1 mes
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-[#94A3B8]">
-              {['Sin tarjeta', 'Setup en 10 minutos', 'Clientes gratis'].map((item) => (
+              {['Sin tarjeta', 'Setup en 10 minutos', '1 mes gratis'].map((item) => (
                 <span key={item} className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-[#FF6A00]" />
                   {item}
@@ -222,12 +222,13 @@ export default function HomePage() {
               <div>
                 <p className="text-sm text-[#94A3B8]">Plan Pro Coach</p>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-4xl font-black text-white">€29</span>
-                  <span className="text-sm text-[#94A3B8]">/mes</span>
+                  <span className="text-4xl font-black text-white">Gratis</span>
+                  <span className="text-sm text-[#94A3B8]">el primer mes</span>
                 </div>
+                <p className="mt-1 text-xs text-[#94A3B8]">Después, €29/mes. Sin tarjeta para empezar.</p>
               </div>
               <Link href="/signup" className="btn-primary justify-center">
-                Crear cuenta
+                Empezar prueba gratis
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
