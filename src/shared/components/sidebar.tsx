@@ -12,10 +12,12 @@ import {
   ChevronRight,
   LogOut,
   BadgeEuro,
+  BookOpen,
   ClipboardCheck,
-  ClipboardList,
   Dumbbell,
   MessageSquare,
+  Star,
+  Users,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { BrandMark } from '@/shared/components/brand-mark'
@@ -29,16 +31,28 @@ const navItems = [
     description: 'Resumen operativo del día: check-ins, mensajes y planes que necesitan atención.',
   },
   {
-    label: 'Clientes',
+    label: 'Atletas',
     href: '/dashboard/clients',
     icon: User,
     description: 'Cartera de clientes: adherencia, pagos, riesgos y próxima acción de cada uno.',
   },
   {
-    label: 'Planes',
+    label: 'Grupos',
+    href: '/dashboard/groups',
+    icon: Users,
+    description: 'Tus atletas organizados por horario, nivel o cohorte.',
+  },
+  {
+    label: 'Favoritos',
+    href: '/dashboard/favorites',
+    icon: Star,
+    description: 'Acceso rápido a los atletas que marcaste con estrella.',
+  },
+  {
+    label: 'Biblioteca',
     href: '/dashboard/workouts',
-    icon: ClipboardList,
-    description: 'Crea y gestiona rutinas de entrenamiento para asignar a tus clientes.',
+    icon: BookOpen,
+    description: 'Crea y gestiona rutinas de entrenamiento para asignar a tus atletas.',
   },
   {
     label: 'Ejercicios',
@@ -50,7 +64,7 @@ const navItems = [
     label: 'Check-ins',
     href: '/dashboard/checkins',
     icon: ClipboardCheck,
-    description: 'Revisa y aprueba los check-ins que te envían tus clientes.',
+    description: 'Revisa y aprueba los check-ins que te envían tus atletas.',
   },
   {
     label: 'Agenda',
@@ -62,13 +76,13 @@ const navItems = [
     label: 'Pagos',
     href: '/dashboard/payments',
     icon: BadgeEuro,
-    description: 'Controla ingresos, renovaciones y pagos pendientes de cada cliente.',
+    description: 'Controla ingresos, renovaciones y pagos pendientes de cada atleta.',
   },
   {
     label: 'Mensajes',
     href: '/dashboard/messages',
     icon: MessageSquare,
-    description: 'Conversaciones con tus clientes, con contexto de su plan y progreso.',
+    description: 'Conversaciones con tus atletas, con contexto de su plan y progreso.',
   },
   {
     label: 'Perfil',

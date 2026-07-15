@@ -32,6 +32,8 @@ export interface ClientRecord {
   notes: string
   risks: string[]
   tags: string[]
+  group: string | null
+  favorite: boolean
 }
 
 export const clientTimeline = [

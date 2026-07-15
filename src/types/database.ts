@@ -36,6 +36,8 @@ export type Cliente = {
   notas: string | null
   riesgos: string[]
   etiquetas: string[]
+  grupo: string | null
+  favorito: boolean
   creado_en: string
   actualizado_en: string
 }

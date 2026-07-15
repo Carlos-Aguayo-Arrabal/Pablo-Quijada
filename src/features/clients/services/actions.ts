@@ -58,6 +58,8 @@ function mapClient(row: Cliente): ClientRecord {
     notes: row.notas ?? '',
     risks: row.riesgos ?? [],
     tags: row.etiquetas ?? [],
+    group: row.grupo,
+    favorite: row.favorito,
   }
 }
 
@@ -112,9 +114,10 @@ const createClientSchema = z.object({
   name: z.string().min(2, 'Mínimo 2 caracteres'),
   email: z.string().email('Email inválido'),
   service: z.string().min(1, 'Selecciona un servicio'),
+  group: z.string().max(60, 'Máximo 60 caracteres').optional(),
 })
 
-export async function createClient(input: { name: string; email: string; service: string }) {
+export async function createClient(input: { name: string; email: string; service: string; group?: string }) {
   const parsed = createClientSchema.safeParse(input)
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? 'Datos inválidos' }
@@ -137,10 +140,54 @@ export async function createClient(input: { name: string; email: string; service
     estado: 'Pendiente',
     tipo_proxima_accion: nextActionTypeToEs.message,
     proxima_accion: 'Enviar mensaje de bienvenida',
+    grupo: parsed.data.group || null,
   })
 
   if (error) return { error: error.message }
 
   revalidatePath('/dashboard/clients')
+  return { success: true }
+}
+
+export async function toggleClientFavorite(id: string, favorite: boolean) {
+  if (await isDemoSession()) {
+    revalidatePath('/dashboard/clients')
+    revalidatePath('/dashboard/favorites')
+    return { success: true }
+  }
+
+  const supabase = await createSupabaseClient()
+  const { error } = await supabase.from('clientes').update({ favorito: favorite }).eq('id', id)
+  if (error) return { error: error.message }
+
+  revalidatePath('/dashboard/clients')
+  revalidatePath('/dashboard/favorites')
+  return { success: true }
+}
+
+const updateClientGroupSchema = z.object({
+  group: z.string().max(60, 'Máximo 60 caracteres'),
+})
+
+export async function updateClientGroup(id: string, input: { group: string }) {
+  const parsed = updateClientGroupSchema.safeParse(input)
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Datos inválidos' }
+
+  if (await isDemoSession()) {
+    revalidatePath('/dashboard/clients')
+    revalidatePath('/dashboard/groups')
+    return { success: true }
+  }
+
+  const supabase = await createSupabaseClient()
+  const { error } = await supabase
+    .from('clientes')
+    .update({ grupo: parsed.data.group || null })
+    .eq('id', id)
+
+  if (error) return { error: error.message }
+
+  revalidatePath('/dashboard/clients')
+  revalidatePath('/dashboard/groups')
   return { success: true }
 }

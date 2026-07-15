@@ -10,11 +10,13 @@ import {
   Settings,
   LogOut,
   BadgeEuro,
+  BookOpen,
   ClipboardCheck,
-  ClipboardList,
   Dumbbell,
   MessageSquare,
   Menu,
+  Star,
+  Users,
   X,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
@@ -22,13 +24,15 @@ import { signout } from '@/actions/auth'
 
 const primaryItems = [
   { label: 'Inicio', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'Clientes', href: '/dashboard/clients', icon: User },
+  { label: 'Atletas', href: '/dashboard/clients', icon: User },
   { label: 'Agenda', href: '/dashboard/history', icon: History },
   { label: 'Mensajes', href: '/dashboard/messages', icon: MessageSquare },
 ]
 
 const moreItems = [
-  { label: 'Planes', href: '/dashboard/workouts', icon: ClipboardList },
+  { label: 'Grupos', href: '/dashboard/groups', icon: Users },
+  { label: 'Favoritos', href: '/dashboard/favorites', icon: Star },
+  { label: 'Biblioteca', href: '/dashboard/workouts', icon: BookOpen },
   { label: 'Ejercicios', href: '/dashboard/exercises', icon: Dumbbell },
   { label: 'Check-ins', href: '/dashboard/checkins', icon: ClipboardCheck },
   { label: 'Pagos', href: '/dashboard/payments', icon: BadgeEuro },

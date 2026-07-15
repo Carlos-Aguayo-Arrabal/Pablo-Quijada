@@ -11,6 +11,7 @@ export function InviteClientForm() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [service, setService] = useState('Fuerza 12 semanas')
+  const [group, setGroup] = useState('')
   const [message, setMessage] = useState('Te dejo acceso a tu portal con rutinas, check-ins y mensajes. Entra, revisa tu primera semana y dime cualquier duda.')
   const [sent, setSent] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -27,7 +28,7 @@ export function InviteClientForm() {
     setError(null)
     setIsSubmitting(true)
 
-    const result = await createClient({ name, email, service })
+    const result = await createClient({ name, email, service, group })
 
     if (result.error) {
       setError(result.error)
@@ -94,6 +95,10 @@ export function InviteClientForm() {
           <label className="block">
             <span className="mb-1.5 block text-xs text-[#94A3B8]">Primer check-in</span>
             <input className="input-field" type="date" defaultValue="2026-07-14" />
+          </label>
+          <label className="block">
+            <span className="mb-1.5 block text-xs text-[#94A3B8]">Grupo (opcional)</span>
+            <input value={group} onChange={(event) => setGroup(event.target.value)} className="input-field" placeholder="Ej: Fuerza · Mañanas" />
           </label>
         </div>
 

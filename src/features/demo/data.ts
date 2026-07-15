@@ -61,6 +61,8 @@ const demoClients: ClientRecord[] = [
     notes: 'Está progresando bien. Mantener foco en press con tempo y control escapular.',
     risks: [],
     tags: ['Premium', 'Fuerza', 'Técnica'],
+    group: 'Fuerza · Mañanas',
+    favorite: true,
   },
   {
     id: demoClientIds.carlos,
@@ -85,6 +87,8 @@ const demoClients: ClientRecord[] = [
     notes: 'Semana complicada por viajes. Conviene ajustar volumen y simplificar objetivos nutricionales.',
     risks: ['Adherencia baja', 'Sueño bajo', 'Pago pendiente'],
     tags: ['Riesgo', 'Viajes', 'Nutrición'],
+    group: 'Recomposición · Tardes',
+    favorite: false,
   },
   {
     id: demoClientIds.marta,
@@ -109,6 +113,8 @@ const demoClients: ClientRecord[] = [
     notes: 'Cliente recién incorporada. Falta confirmar horarios y bloquear días de entrenamiento.',
     risks: ['Onboarding incompleto'],
     tags: ['Nueva', 'Hipertrofia', 'Glúteo'],
+    group: 'Hipertrofia · Tardes',
+    favorite: false,
   },
   {
     id: demoClientIds.javier,
@@ -133,6 +139,8 @@ const demoClients: ClientRecord[] = [
     notes: 'Tolera bien carga unilateral. Siguiente paso: introducir cambios de dirección suaves.',
     risks: [],
     tags: ['Readaptación', 'Rodilla', 'Premium'],
+    group: 'Readaptación',
+    favorite: true,
   },
   {
     id: demoClientIds.ana,
@@ -157,6 +165,8 @@ const demoClients: ClientRecord[] = [
     notes: 'Pausada por agenda. Tiene intención de volver con dos sesiones por semana.',
     risks: ['Suscripción pausada'],
     tags: ['Pausado', 'Acondicionamiento'],
+    group: null,
+    favorite: false,
   },
   {
     id: demoClientIds.diego,
@@ -181,6 +191,8 @@ const demoClients: ClientRecord[] = [
     notes: 'Buen rendimiento, pero sube fatiga cuando acumula partidos. Ajustar semana de descarga.',
     risks: ['Fatiga moderada'],
     tags: ['Rendimiento', 'Potencia', 'Pádel'],
+    group: 'Rendimiento · Pádel',
+    favorite: false,
   },
 ]
 

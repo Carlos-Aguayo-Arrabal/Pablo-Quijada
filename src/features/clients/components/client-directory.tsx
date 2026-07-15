@@ -13,10 +13,12 @@ import {
   MessageSquare,
   Search,
   SlidersHorizontal,
+  Star,
   TrendingUp,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { getAdherenceTone, getStatusTone, type ClientRecord, type ClientStatus } from '@/features/clients/data'
+import { toggleClientFavorite } from '@/features/clients/services/actions'
 
 const filters: Array<ClientStatus | 'Todos'> = ['Todos', 'Activo', 'Riesgo', 'Pendiente', 'Pausado']
 
@@ -36,12 +38,33 @@ const summaryTone = {
 interface ClientDirectoryProps {
   clients: ClientRecord[]
   summary: { total: number; activeCount: number; riskCount: number; pendingCheckins: number; mrr: number }
+  title?: string
+  subtitle?: string
+  eyebrow?: string
+  showInviteButton?: boolean
 }
 
-export function ClientDirectory({ clients, summary }: ClientDirectoryProps) {
+export function ClientDirectory({
+  clients: initialClients,
+  summary,
+  title = 'Clientes',
+  subtitle = 'Gestiona adherencia, pagos, check-ins y la próxima acción de cada persona desde una sola vista.',
+  eyebrow = 'Cartera de clientes',
+  showInviteButton = true,
+}: ClientDirectoryProps) {
+  const [clients, setClients] = useState(initialClients)
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState<ClientStatus | 'Todos'>('Todos')
   const [sort, setSort] = useState<'priority' | 'adherence' | 'revenue'>('priority')
+
+  async function handleToggleFavorite(client: ClientRecord) {
+    const nextFavorite = !client.favorite
+    setClients((current) => current.map((c) => (c.id === client.id ? { ...c, favorite: nextFavorite } : c)))
+    const result = await toggleClientFavorite(client.id, nextFavorite)
+    if (result?.error) {
+      setClients((current) => current.map((c) => (c.id === client.id ? { ...c, favorite: !nextFavorite } : c)))
+    }
+  }
 
   const clientSummary = [
     { label: 'Clientes activos', value: String(summary.activeCount), detail: `${summary.total} en total`, icon: CheckCircle2, tone: 'orange' as const },
@@ -78,21 +101,21 @@ export function ClientDirectory({ clients, summary }: ClientDirectoryProps) {
     <div className="mx-auto max-w-7xl p-5 lg:p-8">
       <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#FF6A00]">Cartera de clientes</p>
-          <h1 className="mt-1 text-3xl font-black text-white">Clientes</h1>
-          <p className="mt-2 max-w-2xl text-sm text-[#94A3B8]">
-            Gestiona adherencia, pagos, check-ins y la próxima acción de cada persona desde una sola vista.
-          </p>
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#FF6A00]">{eyebrow}</p>
+          <h1 className="mt-1 text-3xl font-black text-white">{title}</h1>
+          <p className="mt-2 max-w-2xl text-sm text-[#94A3B8]">{subtitle}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link href="/dashboard/messages" className="btn-secondary px-4 py-2 text-sm">
             <MessageSquare className="h-4 w-4" />
             Mensaje grupal
           </Link>
-          <Link href="/dashboard/clients/new" className="btn-primary px-4 py-2 text-sm">
-            Invitar cliente
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          {showInviteButton && (
+            <Link href="/dashboard/clients/new" className="btn-primary px-4 py-2 text-sm">
+              Invitar cliente
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          )}
         </div>
       </div>
 
@@ -179,7 +202,23 @@ export function ClientDirectory({ clients, summary }: ClientDirectoryProps) {
                   </p>
                 </div>
               </div>
-              <span className="w-fit rounded-full bg-[#FFB000]/10 px-3 py-1 text-xs font-bold text-[#FFB000]">{client.revenue}</span>
+              <div className="flex shrink-0 items-center gap-2">
+                <span className="w-fit rounded-full bg-[#FFB000]/10 px-3 py-1 text-xs font-bold text-[#FFB000]">{client.revenue}</span>
+                <button
+                  type="button"
+                  onClick={() => handleToggleFavorite(client)}
+                  aria-label={client.favorite ? 'Quitar de favoritos' : 'Marcar como favorito'}
+                  title={client.favorite ? 'Quitar de favoritos' : 'Marcar como favorito'}
+                  className={cn(
+                    'flex h-8 w-8 items-center justify-center rounded-full border transition',
+                    client.favorite
+                      ? 'border-[#FFB000]/40 bg-[#FFB000]/15 text-[#FFB000]'
+                      : 'border-white/[0.08] bg-white/[0.03] text-[#475569] hover:text-[#FFB000]'
+                  )}
+                >
+                  <Star className="h-4 w-4" fill={client.favorite ? 'currentColor' : 'none'} />
+                </button>
+              </div>
             </div>
 
             <div className="mb-4 rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
@@ -214,6 +253,9 @@ export function ClientDirectory({ clients, summary }: ClientDirectoryProps) {
             </div>
 
             <div className="mt-4 flex flex-wrap gap-2">
+              {client.group && (
+                <span className="rounded-full border border-[#FF6A00]/25 bg-[#FF6A00]/10 px-2.5 py-1 text-xs font-semibold text-[#FF6A00]">{client.group}</span>
+              )}
               {client.tags.map((tag) => (
                 <span key={tag} className="rounded-full bg-white/[0.04] px-2.5 py-1 text-xs text-[#94A3B8]">{tag}</span>
               ))}

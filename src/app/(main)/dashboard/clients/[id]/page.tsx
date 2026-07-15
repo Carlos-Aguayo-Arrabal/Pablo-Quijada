@@ -12,6 +12,7 @@ import {
 import { clientMetrics, getAdherenceTone, getStatusTone } from '@/features/clients/data'
 import { getClientById } from '@/features/clients/services/actions'
 import { ClientProfileTabs } from '@/features/clients/components/client-profile-tabs'
+import { ClientGroupEditor } from '@/features/clients/components/client-group-editor'
 import { listPaymentsByClient } from '@/features/payments/services/actions'
 import { listPerformanceTests } from '@/features/performance-tests/services/actions'
 import { listWellnessHistory } from '@/features/wellness/services/actions'
@@ -58,6 +59,7 @@ export default async function ClientDetailPage({
                 <span className="rounded-full bg-white/[0.06] px-3 py-1 text-xs font-semibold text-[#C8D2E3]">
                   Portal activo
                 </span>
+                <ClientGroupEditor clientId={client.id} initialGroup={client.group} />
               </div>
               <h1 className="text-3xl font-black text-white">{client.name}</h1>
               <p className="mt-1 max-w-2xl text-sm text-[#94A3B8]">{client.goal}</p>
