@@ -15,15 +15,17 @@ import { jsDayToDiaSemana } from '@/features/agenda/data'
 import type { AvailableSlot, ClientPlan, ClientPlanExercise, MyMessage, MyProfile, MySession } from '@/features/client/types'
 
 const signupClientSchema = z.object({
+  name: z.string().min(2, 'Mínimo 2 caracteres').optional(),
   email: z.string().email('Email inválido'),
   password: z
     .string()
     .min(8, 'Mínimo 8 caracteres')
     .regex(/[A-Z]/, 'Al menos una mayúscula')
     .regex(/[0-9]/, 'Al menos un número'),
+  code: z.string().optional(),
 })
 
-export async function signupClient(input: { email: string; password: string }) {
+export async function signupClient(input: { name?: string; email: string; password: string; code?: string }) {
   const parsed = signupClientSchema.safeParse(input)
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? 'Datos inválidos' }
@@ -32,11 +34,14 @@ export async function signupClient(input: { email: string; password: string }) {
   const supabase = await createClient()
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://traintools.es'
 
+  const inviteCodeParam = parsed.data.code ? `&invite_code=${encodeURIComponent(parsed.data.code)}` : ''
+
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
-      emailRedirectTo: `${siteUrl}/callback?next=${encodeURIComponent('/client')}`,
+      data: parsed.data.name ? { full_name: parsed.data.name } : undefined,
+      emailRedirectTo: `${siteUrl}/callback?next=${encodeURIComponent('/client')}${inviteCodeParam}`,
     },
   })
 

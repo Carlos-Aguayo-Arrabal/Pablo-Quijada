@@ -11,6 +11,7 @@ import { signupClient } from '@/features/client/services/actions'
 
 const clientSignupSchema = z
   .object({
+    name: z.string().min(2, 'Mínimo 2 caracteres').optional(),
     email: z.string().email('Email inválido'),
     password: z
       .string()
@@ -29,6 +30,7 @@ type ClientSignupFormData = z.infer<typeof clientSignupSchema>
 export function ClientSignupForm() {
   const searchParams = useSearchParams()
   const invitedEmail = searchParams.get('email') ?? ''
+  const inviteCode = searchParams.get('code') ?? ''
 
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -57,7 +59,7 @@ export function ClientSignupForm() {
     setIsLoading(true)
     setError(null)
 
-    const result = await signupClient({ email: data.email, password: data.password })
+    const result = await signupClient({ name: data.name, email: data.email, password: data.password, code: inviteCode || undefined })
 
     if (result.error) {
       setError(result.error)
@@ -88,6 +90,20 @@ export function ClientSignupForm() {
         </div>
       )}
 
+      {inviteCode && (
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-[#94A3B8]">Nombre</label>
+          <input
+            {...register('name')}
+            type="text"
+            placeholder="Tu nombre completo"
+            className={cn('input-field', errors.name && 'border-[#F87171]/50')}
+            id="client-signup-name"
+          />
+          {errors.name && <p className="text-xs text-[#F87171]">{errors.name.message}</p>}
+        </div>
+      )}
+
       <div className="space-y-1.5">
         <label className="text-sm font-medium text-[#94A3B8]">Email</label>
         <input
@@ -97,7 +113,9 @@ export function ClientSignupForm() {
           className={cn('input-field', errors.email && 'border-[#F87171]/50')}
           id="client-signup-email"
         />
-        <p className="text-xs text-[#475569]">Debe coincidir con el email al que tu entrenador te invitó.</p>
+        {!inviteCode && (
+          <p className="text-xs text-[#475569]">Debe coincidir con el email al que tu entrenador te invitó.</p>
+        )}
         {errors.email && <p className="text-xs text-[#F87171]">{errors.email.message}</p>}
       </div>
 

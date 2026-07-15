@@ -7,6 +7,7 @@ export type Profile = {
   full_name: string | null
   avatar_url: string | null
   goal: FitnessGoal | null
+  codigo_invitacion: string | null
   created_at: string
   updated_at: string
 }
@@ -609,6 +610,10 @@ export interface Database {
     Functions: {
       claim_client_invite: {
         Args: Record<string, never>
+        Returns: Cliente
+      }
+      claim_client_invite_by_code: {
+        Args: { p_code: string }
         Returns: Cliente
       }
       touch_client_last_seen: {

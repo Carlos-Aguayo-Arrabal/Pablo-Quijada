@@ -22,6 +22,13 @@ export async function GET(request: Request) {
       if (next.startsWith('/client')) {
         const { error: claimError } = await supabase.rpc('claim_client_invite')
         if (claimError) {
+          const inviteCode = searchParams.get('invite_code')
+          if (inviteCode) {
+            const { error: codeError } = await supabase.rpc('claim_client_invite_by_code', { p_code: inviteCode })
+            if (!codeError) {
+              return NextResponse.redirect(`${origin}/client`)
+            }
+          }
           return NextResponse.redirect(`${origin}/client/signup?error=no_invite`)
         }
         return NextResponse.redirect(`${origin}/client`)

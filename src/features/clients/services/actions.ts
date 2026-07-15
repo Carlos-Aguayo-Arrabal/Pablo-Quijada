@@ -191,3 +191,49 @@ export async function updateClientGroup(id: string, input: { group: string }) {
   revalidatePath('/dashboard/groups')
   return { success: true }
 }
+
+const INVITE_CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789' // sin 0/O/1/I/L, para que no se confundan al copiarlo a mano
+
+function generateInviteCode() {
+  let code = ''
+  for (let i = 0; i < 8; i++) {
+    code += INVITE_CODE_CHARS[Math.floor(Math.random() * INVITE_CODE_CHARS.length)]
+  }
+  return code
+}
+
+export async function getOrCreateInviteCode(): Promise<{ code: string } | { error: string }> {
+  if (await isDemoSession()) return { code: 'DEMO2026' }
+
+  const supabase = await createSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'No autenticado' }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('codigo_invitacion')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  if (profile?.codigo_invitacion) return { code: profile.codigo_invitacion }
+
+  const code = generateInviteCode()
+  const { error } = await supabase.from('profiles').update({ codigo_invitacion: code }).eq('id', user.id)
+  if (error) return { error: error.message }
+
+  return { code }
+}
+
+export async function regenerateInviteCode(): Promise<{ code: string } | { error: string }> {
+  if (await isDemoSession()) return { code: 'DEMO2026' }
+
+  const supabase = await createSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'No autenticado' }
+
+  const code = generateInviteCode()
+  const { error } = await supabase.from('profiles').update({ codigo_invitacion: code }).eq('id', user.id)
+  if (error) return { error: error.message }
+
+  return { code }
+}
