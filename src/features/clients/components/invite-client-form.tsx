@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { CheckCircle2, Copy, Mail, Send, UserPlus } from 'lucide-react'
+import { CheckCircle2, Copy, Mail, MessageCircle, Send, UserPlus } from 'lucide-react'
 import { createClient } from '@/features/clients/services/actions'
 
 export function InviteClientForm() {
@@ -23,6 +23,10 @@ export function InviteClientForm() {
     if (!trimmedEmail) return 'https://traintools.es/client/signup'
     return `https://traintools.es/client/signup?email=${encodeURIComponent(trimmedEmail)}`
   }, [email])
+
+  const whatsappUrl = useMemo(() => {
+    return `https://wa.me/?text=${encodeURIComponent(`${message} ${inviteUrl}`)}`
+  }, [message, inviteUrl])
 
   async function sendInvite() {
     setError(null)
@@ -116,6 +120,10 @@ export function InviteClientForm() {
             <Copy className="h-4 w-4" />
             Copiar enlace
           </button>
+          <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="btn-primary bg-[#25D366] hover:bg-[#20BD5A]">
+            <MessageCircle className="h-4 w-4" />
+            WhatsApp
+          </a>
           <Link href="/dashboard/messages" className="btn-secondary">
             <Mail className="h-4 w-4" />
             Preparar mensaje

@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import {
   AlertTriangle,
@@ -19,6 +19,7 @@ import {
 import { cn } from '@/shared/lib/utils'
 import { getAdherenceTone, getStatusTone, type ClientRecord, type ClientStatus } from '@/features/clients/data'
 import { toggleClientFavorite } from '@/features/clients/services/actions'
+import { InviteClientModal } from '@/features/clients/components/invite-client-modal'
 
 const filters: Array<ClientStatus | 'Todos'> = ['Todos', 'Activo', 'Riesgo', 'Pendiente', 'Pausado']
 
@@ -53,9 +54,11 @@ export function ClientDirectory({
   showInviteButton = true,
 }: ClientDirectoryProps) {
   const [clients, setClients] = useState(initialClients)
+  useEffect(() => setClients(initialClients), [initialClients])
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState<ClientStatus | 'Todos'>('Todos')
   const [sort, setSort] = useState<'priority' | 'adherence' | 'revenue'>('priority')
+  const [isInviteOpen, setIsInviteOpen] = useState(false)
 
   async function handleToggleFavorite(client: ClientRecord) {
     const nextFavorite = !client.favorite
@@ -111,10 +114,10 @@ export function ClientDirectory({
             Mensaje grupal
           </Link>
           {showInviteButton && (
-            <Link href="/dashboard/clients/new" className="btn-primary px-4 py-2 text-sm">
-              Invitar cliente
+            <button type="button" onClick={() => setIsInviteOpen(true)} className="btn-primary px-4 py-2 text-sm">
+              Invitar atleta
               <ArrowRight className="h-4 w-4" />
-            </Link>
+            </button>
           )}
         </div>
       </div>
@@ -228,7 +231,7 @@ export function ClientDirectory({
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-xl bg-white/[0.03] p-3">
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
                 <p className="flex items-center gap-1 text-xs text-[#475569]">
                   <TrendingUp className="h-3 w-3" />
                   Adherencia
@@ -238,12 +241,12 @@ export function ClientDirectory({
                   <div className="progress-fill" style={{ width: `${client.adherence}%` }} />
                 </div>
               </div>
-              <div className="rounded-xl bg-white/[0.03] p-3">
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
                 <p className="text-xs text-[#475569]">Entrenos</p>
                 <p className="mt-1 text-sm font-bold text-white">{client.workouts}</p>
                 <p className="mt-1 text-xs text-[#94A3B8]">{client.checkIns}</p>
               </div>
-              <div className="rounded-xl bg-white/[0.03] p-3">
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
                 <p className="flex items-center gap-1 text-xs text-[#475569]">
                   <Calendar className="h-3 w-3" />
                   Próxima acción
@@ -280,6 +283,8 @@ export function ClientDirectory({
           <p className="mt-2 text-sm text-[#94A3B8]">Prueba otro estado o busca por nombre, servicio u objetivo.</p>
         </div>
       )}
+
+      {isInviteOpen && <InviteClientModal onClose={() => setIsInviteOpen(false)} />}
     </div>
   )
 }
