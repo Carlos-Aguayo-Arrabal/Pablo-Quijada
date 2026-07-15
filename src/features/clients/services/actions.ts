@@ -60,6 +60,11 @@ function mapClient(row: Cliente): ClientRecord {
     tags: row.etiquetas ?? [],
     group: row.grupo,
     favorite: row.favorito,
+    level: row.nivel,
+    age: row.edad,
+    maxHeartRate: row.fc_maxima,
+    height: row.altura,
+    injuries: row.lesiones ?? '',
   }
 }
 
@@ -236,4 +241,46 @@ export async function regenerateInviteCode(): Promise<{ code: string } | { error
   if (error) return { error: error.message }
 
   return { code }
+}
+
+const bioDataSchema = z.object({
+  level: z.enum(['Iniciado', 'Intermedio', 'Avanzado']).nullable(),
+  age: z.number().int().min(1).max(120).nullable(),
+  maxHeartRate: z.number().int().min(1).max(300).nullable(),
+  height: z.number().int().min(1).max(300).nullable(),
+  weight: z.string().max(20),
+  goal: z.string().max(500),
+  injuries: z.string().max(500),
+  notes: z.string().max(1000),
+})
+
+export async function updateClientBioData(id: string, input: z.infer<typeof bioDataSchema>) {
+  const parsed = bioDataSchema.safeParse(input)
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Datos inválidos' }
+
+  if (await isDemoSession()) {
+    revalidatePath('/dashboard/clients')
+    return { success: true }
+  }
+
+  const supabase = await createSupabaseClient()
+  const { error } = await supabase
+    .from('clientes')
+    .update({
+      nivel: parsed.data.level,
+      edad: parsed.data.age,
+      fc_maxima: parsed.data.maxHeartRate,
+      altura: parsed.data.height,
+      peso: parsed.data.weight || null,
+      objetivo: parsed.data.goal || null,
+      lesiones: parsed.data.injuries || null,
+      notas: parsed.data.notes || null,
+    })
+    .eq('id', id)
+
+  if (error) return { error: error.message }
+
+  revalidatePath(`/dashboard/clients/${id}`)
+  revalidatePath('/dashboard/clients')
+  return { success: true }
 }

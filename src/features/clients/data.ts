@@ -34,6 +34,18 @@ export interface ClientRecord {
   tags: string[]
   group: string | null
   favorite: boolean
+  level: 'Iniciado' | 'Intermedio' | 'Avanzado' | null
+  age: number | null
+  maxHeartRate: number | null
+  height: number | null
+  injuries: string
+}
+
+export function getLevelTone(level: ClientRecord['level']) {
+  if (level === 'Avanzado') return 'border-[#FF6A00]/25 bg-[#FF6A00]/10 text-[#FF6A00]'
+  if (level === 'Intermedio') return 'border-[#FFB000]/25 bg-[#FFB000]/10 text-[#FFB000]'
+  if (level === 'Iniciado') return 'border-white/15 bg-white/[0.05] text-[#94A3B8]'
+  return 'border-white/15 bg-white/[0.05] text-[#94A3B8]'
 }
 
 export const clientTimeline = [

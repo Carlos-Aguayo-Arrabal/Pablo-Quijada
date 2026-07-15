@@ -20,6 +20,7 @@ import { TestsList } from '@/features/performance-tests/components/tests-list'
 import type { WellnessCheck } from '@/features/wellness/data'
 import type { AiSummary } from '@/features/ai-summary/data'
 import { AiSummaryCard } from '@/features/ai-summary/components/ai-summary-card'
+import { ClientBioCard } from '@/features/clients/components/client-bio-card'
 
 type ClientTab = 'Resumen' | 'Entrenamiento' | 'Nutrición' | 'Progreso' | 'Pagos' | 'Mensajes'
 
@@ -111,6 +112,7 @@ export function ClientProfileTabs({ client, payments, tests, wellnessHistory, ai
               </div>
             </section>
 
+            <ClientBioCard client={client} />
             <AiSummaryCard clienteId={client.id} initialSummary={aiSummary} />
             <RiskPanel client={client} />
           </aside>

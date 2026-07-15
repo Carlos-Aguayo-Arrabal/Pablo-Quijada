@@ -39,6 +39,11 @@ export type Cliente = {
   etiquetas: string[]
   grupo: string | null
   favorito: boolean
+  nivel: 'Iniciado' | 'Intermedio' | 'Avanzado' | null
+  edad: number | null
+  fc_maxima: number | null
+  altura: number | null
+  lesiones: string | null
   creado_en: string
   actualizado_en: string
 }
