@@ -56,7 +56,7 @@ export function CheckinForm({ pesoActual }: { pesoActual: string | null }) {
             max="10"
             value={energy}
             onChange={(event) => setEnergy(Number(event.target.value))}
-            className="w-full accent-[#FF6A00]"
+            className="w-full accent-brand"
           />
         </label>
         <label className="block">
@@ -74,7 +74,7 @@ export function CheckinForm({ pesoActual }: { pesoActual: string | null }) {
           <ChevronRight className="h-4 w-4" />
         </button>
         {sent && (
-          <p className="rounded-xl border border-[#FF6A00]/25 bg-[#FF6A00]/10 px-3 py-2 text-xs text-[#FF6A00]">
+          <p className="rounded-xl border border-brand/25 bg-brand/10 px-3 py-2 text-xs text-brand">
             Check-in enviado. Tu entrenador lo verá en su panel.
           </p>
         )}

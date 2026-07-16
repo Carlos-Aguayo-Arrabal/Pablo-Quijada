@@ -44,7 +44,7 @@ export function TodayWorkoutPanel({ plan }: { plan: ClientPlan }) {
 
   return (
     <>
-      <section className="mb-6 rounded-2xl border border-[#FF6A00]/20 bg-gradient-to-br from-[#FF6A00]/12 to-[#FFB000]/10 p-5">
+      <section className="mb-6 rounded-2xl border border-brand/20 bg-gradient-to-br from-brand/12 to-brand2/10 p-5">
         <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <div className="badge badge-teal mb-3">
@@ -60,13 +60,13 @@ export function TodayWorkoutPanel({ plan }: { plan: ClientPlan }) {
           </div>
           {exercises.length > 0 && (
             <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 text-center">
-              <div className="text-3xl font-black text-[#FF6A00]">{exerciseProgress}%</div>
+              <div className="text-3xl font-black text-brand">{exerciseProgress}%</div>
               <div className="text-xs text-[#94A3B8]">completado</div>
             </div>
           )}
         </div>
         {sessionFinished && (
-          <div className="mb-5 rounded-xl border border-[#FF6A00]/25 bg-[#FF6A00]/10 px-4 py-3 text-sm text-[#FF6A00]">
+          <div className="mb-5 rounded-xl border border-brand/25 bg-brand/10 px-4 py-3 text-sm text-brand">
             Sesión finalizada. Tu coach verá el entrenamiento completado con tus registros.
           </div>
         )}
@@ -78,7 +78,7 @@ export function TodayWorkoutPanel({ plan }: { plan: ClientPlan }) {
               { icon: Target, label: 'Objetivo', value: 'Fuerza' },
             ].map((item) => (
               <div key={item.label} className="rounded-xl bg-white/[0.04] p-3">
-                <item.icon className="mb-2 h-4 w-4 text-[#FF6A00]" />
+                <item.icon className="mb-2 h-4 w-4 text-brand" />
                 <p className="text-xs text-[#94A3B8]">{item.label}</p>
                 <p className="text-sm font-semibold">{item.value}</p>
               </div>
@@ -102,7 +102,7 @@ export function TodayWorkoutPanel({ plan }: { plan: ClientPlan }) {
                   key={exercise.id}
                   className={cn(
                     'rounded-xl border p-4 transition',
-                    done ? 'border-[#FF6A00]/25 bg-[#FF6A00]/8' : 'border-white/[0.08] bg-white/[0.03]'
+                    done ? 'border-brand/25 bg-brand/8' : 'border-white/[0.08] bg-white/[0.03]'
                   )}
                 >
                   <div className="flex gap-3">
@@ -112,8 +112,8 @@ export function TodayWorkoutPanel({ plan }: { plan: ClientPlan }) {
                       className={cn(
                         'mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition',
                         done
-                          ? 'border-[#FF6A00] bg-[#FF6A00] text-[#080C14]'
-                          : 'border-white/15 text-[#475569] hover:border-[#FF6A00]/60 hover:text-[#FF6A00]'
+                          ? 'border-brand bg-brand text-[#080C14]'
+                          : 'border-white/15 text-[#475569] hover:border-brand/60 hover:text-brand'
                       )}
                       aria-label={done ? 'Marcar como pendiente' : 'Marcar como completado'}
                     >
@@ -123,7 +123,7 @@ export function TodayWorkoutPanel({ plan }: { plan: ClientPlan }) {
                       <div className="flex flex-wrap items-start justify-between gap-2">
                         <div>
                           <p className="text-xs text-[#475569]">Ejercicio {index + 1}</p>
-                          <h3 className={cn('font-semibold', done && 'text-[#FF6A00]')}>{exercise.name}</h3>
+                          <h3 className={cn('font-semibold', done && 'text-brand')}>{exercise.name}</h3>
                         </div>
                         <button
                           type="button"
@@ -198,7 +198,7 @@ export function TodayWorkoutPanel({ plan }: { plan: ClientPlan }) {
       {techniqueTip && (
         <div className="glass-card mt-6 rounded-2xl p-5">
           <div className="mb-2 flex items-center gap-2">
-            <Video className="h-4 w-4 text-[#FF6A00]" />
+            <Video className="h-4 w-4 text-brand" />
             <h2 className="text-sm font-semibold">Guía técnica</h2>
           </div>
           <p className="text-sm text-[#94A3B8]">{techniqueTip}</p>

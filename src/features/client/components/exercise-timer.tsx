@@ -68,7 +68,7 @@ export function ExerciseTimer({ exercise }: { exercise: ClientPlanExercise }) {
         <div>
           <p className="text-xs text-[#475569]">Temporizador de ejercicio</p>
           <div className="mt-1 flex flex-wrap items-baseline gap-2">
-            <span className="text-2xl font-black text-[#FF6A00]">{formatTime(remainingSeconds)}</span>
+            <span className="text-2xl font-black text-brand">{formatTime(remainingSeconds)}</span>
             <span className="text-xs text-[#94A3B8]">
               Serie {phase.set} de {exercise.sets} · {phase.label}
             </span>
@@ -79,7 +79,7 @@ export function ExerciseTimer({ exercise }: { exercise: ClientPlanExercise }) {
             type="button"
             onClick={() => setIsRunning((value) => !value)}
             disabled={remainingSeconds === 0}
-            className="flex h-9 min-w-24 items-center justify-center gap-2 rounded-full bg-[#FF6A00] px-3 text-xs font-bold text-[#080C14] disabled:opacity-50"
+            className="flex h-9 min-w-24 items-center justify-center gap-2 rounded-full bg-brand px-3 text-xs font-bold text-[#080C14] disabled:opacity-50"
           >
             {isRunning ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
             {isRunning ? 'Pausar' : 'Iniciar'}

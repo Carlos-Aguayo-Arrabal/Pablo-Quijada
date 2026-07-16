@@ -35,7 +35,7 @@ export function CoachChat({ initialMessages }: { initialMessages: MyMessage[] })
   return (
     <div className="glass-card rounded-2xl p-5">
       <div className="mb-4 flex items-center gap-2">
-        <MessageSquare className="h-4 w-4 text-[#FFB000]" />
+        <MessageSquare className="h-4 w-4 text-brand2" />
         <h2 className="text-sm font-semibold">Mensajes con tu entrenador</h2>
       </div>
       <div className="mb-3 max-h-64 space-y-2 overflow-y-auto">
@@ -49,7 +49,7 @@ export function CoachChat({ initialMessages }: { initialMessages: MyMessage[] })
             key={m.id}
             className={cn(
               'rounded-xl p-3 text-sm',
-              m.remitente === 'entrenador' ? 'bg-[#FFB000]/10 text-[#DDE2FF]' : 'ml-6 bg-[#FF6A00]/10 text-white'
+              m.remitente === 'entrenador' ? 'bg-brand2/10 text-[#DDE2FF]' : 'ml-6 bg-brand/10 text-white'
             )}
           >
             {m.contenido}
@@ -73,7 +73,7 @@ export function CoachChat({ initialMessages }: { initialMessages: MyMessage[] })
           type="button"
           onClick={handleSend}
           disabled={isSending}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#FF6A00] text-[#080C14] disabled:opacity-60"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand text-[#080C14] disabled:opacity-60"
           aria-label="Enviar mensaje"
         >
           <Send className="h-4 w-4" />

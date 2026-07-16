@@ -52,7 +52,7 @@ export function BookSessionPanel({ initialSlots, initialMySessions }: BookSessio
   return (
     <div className="glass-card rounded-2xl p-5">
       <div className="mb-4 flex items-center gap-2">
-        <Calendar className="h-4 w-4 text-[#FF6A00]" />
+        <Calendar className="h-4 w-4 text-brand" />
         <h2 className="text-sm font-semibold">Reservar cita</h2>
       </div>
 
@@ -62,7 +62,7 @@ export function BookSessionPanel({ initialSlots, initialMySessions }: BookSessio
           {mySessions.map((session) => {
             const date = new Date(session.fechaHora)
             return (
-              <div key={session.id} className="flex items-center justify-between rounded-xl border border-[#FF6A00]/20 bg-[#FF6A00]/5 px-3 py-2">
+              <div key={session.id} className="flex items-center justify-between rounded-xl border border-brand/20 bg-brand/5 px-3 py-2">
                 <div className="text-xs text-white">
                   <p className="font-semibold">
                     {date.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}{' '}
@@ -94,7 +94,7 @@ export function BookSessionPanel({ initialSlots, initialMySessions }: BookSessio
         <button
           type="button"
           onClick={() => setModalidad('presencial')}
-          className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold ${modalidad === 'presencial' ? 'bg-[#FF6A00] text-[#080C14]' : 'bg-white/[0.05] text-[#94A3B8]'}`}
+          className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold ${modalidad === 'presencial' ? 'bg-brand text-[#080C14]' : 'bg-white/[0.05] text-[#94A3B8]'}`}
         >
           <MapPin className="h-3.5 w-3.5" />
           Presencial
@@ -102,7 +102,7 @@ export function BookSessionPanel({ initialSlots, initialMySessions }: BookSessio
         <button
           type="button"
           onClick={() => setModalidad('online')}
-          className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold ${modalidad === 'online' ? 'bg-[#FF6A00] text-[#080C14]' : 'bg-white/[0.05] text-[#94A3B8]'}`}
+          className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold ${modalidad === 'online' ? 'bg-brand text-[#080C14]' : 'bg-white/[0.05] text-[#94A3B8]'}`}
         >
           <Video className="h-3.5 w-3.5" />
           Online
@@ -122,7 +122,7 @@ export function BookSessionPanel({ initialSlots, initialMySessions }: BookSessio
                 type="button"
                 onClick={() => handleBook(slot)}
                 disabled={isBooking}
-                className="rounded-lg border border-white/[0.08] bg-white/[0.03] px-2 py-2 text-left text-xs text-white hover:border-[#FF6A00]/40 hover:bg-[#FF6A00]/10 disabled:opacity-60"
+                className="rounded-lg border border-white/[0.08] bg-white/[0.03] px-2 py-2 text-left text-xs text-white hover:border-brand/40 hover:bg-brand/10 disabled:opacity-60"
               >
                 {isBooking ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />

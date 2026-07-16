@@ -33,7 +33,7 @@ export function HabitsPanel() {
               <span
                 className={cn(
                   'flex h-7 w-7 items-center justify-center rounded-full border',
-                  done ? 'border-[#FF6A00] bg-[#FF6A00] text-[#080C14]' : 'border-white/15 text-[#475569]'
+                  done ? 'border-brand bg-brand text-[#080C14]' : 'border-white/15 text-[#475569]'
                 )}
               >
                 <Check className="h-3.5 w-3.5" />
