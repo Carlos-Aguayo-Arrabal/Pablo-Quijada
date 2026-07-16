@@ -39,11 +39,11 @@ export function ClientPortalView({
   isDemo,
 }: ClientPortalViewProps) {
   return (
-    <div className="min-h-screen bg-[#080C14] text-white">
+    <div className="theme-client min-h-screen bg-[#080C14] text-white">
       <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#080C14]/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-6">
           <div className="min-w-0">
-            <div className="mb-1 inline-flex items-center gap-2 rounded-full border border-[#FFB000]/25 bg-[#FFB000]/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-[#FFB000]">
+            <div className="mb-1 inline-flex items-center gap-2 rounded-full border border-brand2/25 bg-brand2/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-brand2">
               Portal cliente
             </div>
             <h1 className="truncate text-lg font-bold">Hola, {profile.nombre}</h1>
@@ -51,7 +51,7 @@ export function ClientPortalView({
           </div>
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <WorkspaceActions mode="client" userName={profile.nombre} userEmail={profile.email} compact />
-            <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#FF6A00]/30 to-[#FFB000]/30 text-sm font-bold sm:flex">
+            <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand/30 to-brand2/30 text-sm font-bold sm:flex">
               {initialsFor(profile.nombre)}
             </div>
             <form action={signout}>
@@ -75,16 +75,16 @@ export function ClientPortalView({
           <div className="glass-card rounded-2xl p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-sm font-semibold">Resumen</h2>
-              <Activity className="h-4 w-4 text-[#FF6A00]" />
+              <Activity className="h-4 w-4 text-brand" />
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <div className="mb-1.5 flex items-center justify-between text-xs">
                   <span className="text-[#94A3B8]">Adherencia</span>
-                  <span className="font-medium text-[#FF6A00]">{profile.adherencia}%</span>
+                  <span className="font-medium text-brand">{profile.adherencia}%</span>
                 </div>
                 <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: `${profile.adherencia}%`, background: '#FF6A00' }} />
+                  <div className="progress-fill" style={{ width: `${profile.adherencia}%`, background: 'var(--color-teal)' }} />
                 </div>
               </div>
               {profile.pesoActual && (

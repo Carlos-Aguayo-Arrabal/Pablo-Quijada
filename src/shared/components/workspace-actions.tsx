@@ -33,13 +33,13 @@ const modeCopy = {
   admin: {
     label: 'Coach',
     detail: 'Gestionas clientes, programas, pagos y mensajes',
-    tone: 'border-[#FF6A00]/25 bg-[#FF6A00]/10 text-[#FF6A00]',
+    tone: 'border-brand/25 bg-brand/10 text-brand',
     icon: ShieldCheck,
   },
   client: {
     label: 'Portal cliente',
     detail: 'Vista de entrenamiento, hábitos y check-ins',
-    tone: 'border-[#FFB000]/25 bg-[#FFB000]/10 text-[#FFB000]',
+    tone: 'border-brand2/25 bg-brand2/10 text-brand2',
     icon: UserRound,
   },
 }
@@ -125,13 +125,13 @@ export function WorkspaceActions({
           aria-label={`Notificaciones${unreadCount > 0 ? `, ${unreadCount} sin leer` : ''}`}
           title="Notificaciones"
           className={cn(
-            'relative flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-[#94A3B8] transition hover:border-[#FF6A00]/40 hover:text-white',
-            activePanel === 'notifications' && 'border-[#FF6A00]/40 bg-[#FF6A00]/10 text-[#FF6A00]'
+            'relative flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-[#94A3B8] transition hover:border-brand/40 hover:text-white',
+            activePanel === 'notifications' && 'border-brand/40 bg-brand/10 text-brand'
           )}
         >
           <Bell className="h-4 w-4" />
           {unreadCount > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#FF6A00] px-1 text-[10px] font-black text-[#080C14]">
+            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-black text-[#080C14]">
               {unreadCount}
             </span>
           )}
@@ -176,7 +176,7 @@ export function WorkspaceActions({
             <div className="p-4">
               <div className="mb-3 flex items-center justify-between">
                 <p className="text-xs text-[#94A3B8]">{unreadCount} sin leer</p>
-                <button type="button" onClick={markAllRead} className="text-xs font-bold text-[#FF6A00] hover:text-[#FFB000]">
+                <button type="button" onClick={markAllRead} className="text-xs font-bold text-brand hover:text-brand2">
                   Marcar leídas
                 </button>
               </div>
@@ -190,7 +190,7 @@ export function WorkspaceActions({
                       onClick={() => markOneRead(item.id)}
                       className="flex w-full gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] p-3 text-left transition hover:bg-white/[0.06]"
                     >
-                      <span className={cn('mt-1 h-2.5 w-2.5 shrink-0 rounded-full', isRead ? 'bg-[#475569]' : 'bg-[#FF6A00]')} />
+                      <span className={cn('mt-1 h-2.5 w-2.5 shrink-0 rounded-full', isRead ? 'bg-[#475569]' : 'bg-brand')} />
                       <span>
                         <span className="block text-sm font-bold text-white">{item.title}</span>
                         <span className="block text-xs leading-relaxed text-[#94A3B8]">{item.detail}</span>
@@ -214,14 +214,14 @@ export function WorkspaceActions({
                     type="checkbox"
                     checked={push.isSubscribed}
                     disabled={push.loading}
-                    className="h-4 w-4 accent-[#FF6A00]"
+                    className="h-4 w-4 accent-brand"
                     onChange={(event) => (event.target.checked ? push.subscribe() : push.unsubscribe())}
                   />
                 </label>
               ) : (
                 <label className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-sm text-white">
                   Alertas push
-                  <input type="checkbox" defaultChecked className="h-4 w-4 accent-[#FF6A00]" onChange={() => setSaved(false)} />
+                  <input type="checkbox" defaultChecked className="h-4 w-4 accent-brand" onChange={() => setSaved(false)} />
                 </label>
               )}
               {usingRealData && push.isSupported && push.isSubscribed && (
@@ -246,7 +246,7 @@ export function WorkspaceActions({
                 </button>
               )}
               {testStatus === 'sent' && (
-                <p className="rounded-xl border border-[#FF6A00]/25 bg-[#FF6A00]/10 px-3 py-2 text-xs text-[#FF6A00]">
+                <p className="rounded-xl border border-brand/25 bg-brand/10 px-3 py-2 text-xs text-brand">
                   Enviada. Debería llegarte al móvil en unos segundos.
                 </p>
               )}
@@ -257,7 +257,7 @@ export function WorkspaceActions({
               )}
               <label className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-sm text-white">
                 Resumen diario
-                <input type="checkbox" defaultChecked={mode === 'admin'} className="h-4 w-4 accent-[#FF6A00]" onChange={() => setSaved(false)} />
+                <input type="checkbox" defaultChecked={mode === 'admin'} className="h-4 w-4 accent-brand" onChange={() => setSaved(false)} />
               </label>
               {userEmail && <p className="rounded-xl bg-white/[0.03] px-3 py-2 text-xs text-[#94A3B8]">{userEmail}</p>}
               <button type="button" onClick={() => setSaved(true)} className="btn-primary w-full justify-center px-4 py-2 text-xs">
@@ -271,7 +271,7 @@ export function WorkspaceActions({
                 </Link>
               )}
               {saved && (
-                <p className="rounded-xl border border-[#FF6A00]/25 bg-[#FF6A00]/10 px-3 py-2 text-xs text-[#FF6A00]">
+                <p className="rounded-xl border border-brand/25 bg-brand/10 px-3 py-2 text-xs text-brand">
                   Ajustes guardados para esta sesión.
                 </p>
               )}
@@ -301,8 +301,8 @@ function ActionButton({
       aria-label={label}
       title={label}
       className={cn(
-        'flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-[#94A3B8] transition hover:border-[#FF6A00]/40 hover:text-white',
-        active && 'border-[#FF6A00]/40 bg-[#FF6A00]/10 text-[#FF6A00]'
+        'flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-[#94A3B8] transition hover:border-brand/40 hover:text-white',
+        active && 'border-brand/40 bg-brand/10 text-brand'
       )}
     >
       <Icon className="h-4 w-4" />

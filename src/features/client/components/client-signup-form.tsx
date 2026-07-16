@@ -73,7 +73,7 @@ export function ClientSignupForm() {
 
   if (needsConfirmation) {
     return (
-      <div className="rounded-xl border border-[#FF6A00]/30 bg-[#FF6A00]/10 px-4 py-6 text-center">
+      <div className="rounded-xl border border-brand/30 bg-brand/10 px-4 py-6 text-center">
         <p className="text-sm font-medium text-white">Revisa tu email</p>
         <p className="mt-1.5 text-sm text-[#94A3B8]">
           Te hemos enviado un enlace de confirmación. Al confirmarlo entrarás directamente a tu portal.
@@ -141,7 +141,7 @@ export function ClientSignupForm() {
         {password.length > 0 && (
           <div className="flex gap-3">
             {Object.entries(passwordChecks).map(([key, ok]) => (
-              <div key={key} className={cn('flex items-center gap-1 text-xs', ok ? 'text-[#FF6A00]' : 'text-[#475569]')}>
+              <div key={key} className={cn('flex items-center gap-1 text-xs', ok ? 'text-brand' : 'text-[#475569]')}>
                 <Check className={cn('h-3 w-3', !ok && 'opacity-30')} />
                 <span>{key === 'length' ? '8+ chars' : key === 'uppercase' ? 'Mayúscula' : 'Número'}</span>
               </div>

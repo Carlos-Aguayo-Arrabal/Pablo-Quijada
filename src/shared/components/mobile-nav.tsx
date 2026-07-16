@@ -65,7 +65,7 @@ export function MobileNav({ userName = 'Coach', userEmail = '' }: MobileNavProps
               href={item.href}
               className={cn(
                 'flex flex-1 flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors',
-                active ? 'text-[#FF6A00]' : 'text-[#64748B]'
+                active ? 'text-brand' : 'text-[#64748B]'
               )}
             >
               <item.icon className="h-5 w-5" size={20} />
@@ -78,7 +78,7 @@ export function MobileNav({ userName = 'Coach', userEmail = '' }: MobileNavProps
           onClick={() => setIsMoreOpen(true)}
           className={cn(
             'flex flex-1 flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors',
-            moreIsActive || isMoreOpen ? 'text-[#FF6A00]' : 'text-[#64748B]'
+            moreIsActive || isMoreOpen ? 'text-brand' : 'text-[#64748B]'
           )}
         >
           <Menu className="h-5 w-5" size={20} />
@@ -118,7 +118,7 @@ export function MobileNav({ userName = 'Coach', userEmail = '' }: MobileNavProps
                     className={cn(
                       'flex flex-col items-center gap-2 rounded-2xl border p-3 text-center text-xs font-medium transition-colors',
                       active
-                        ? 'border-[#FF6A00]/25 bg-[#FF6A00]/10 text-[#FF6A00]'
+                        ? 'border-brand/25 bg-brand/10 text-brand'
                         : 'border-white/[0.06] bg-white/[0.03] text-[#94A3B8]'
                     )}
                   >
@@ -130,7 +130,7 @@ export function MobileNav({ userName = 'Coach', userEmail = '' }: MobileNavProps
             </div>
 
             <div className="mt-4 flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.03] px-3 py-2.5">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#FFB000]/30 to-[#FF6A00]/30 text-sm font-semibold text-white ring-1 ring-white/10">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand2/30 to-brand/30 text-sm font-semibold text-white ring-1 ring-white/10">
                 {userName.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">

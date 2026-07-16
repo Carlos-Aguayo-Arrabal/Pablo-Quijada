@@ -17,6 +17,8 @@ const config: Config = {
         'fit-red': '#F87171',
         'fit-text': '#F8FAFC',
         'fit-muted': '#94A3B8',
+        brand: 'rgb(var(--color-teal-rgb) / <alpha-value>)',
+        brand2: 'rgb(var(--color-indigo-rgb) / <alpha-value>)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

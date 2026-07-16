@@ -46,7 +46,7 @@ export function WellnessForm() {
   return (
     <form className="glass-card rounded-2xl p-5" onSubmit={handleSubmit}>
       <div className="mb-4 flex items-center gap-2">
-        <HeartPulse className="h-4 w-4 text-[#FB923C]" />
+        <HeartPulse className="h-4 w-4 text-brand" />
         <h2 className="text-sm font-semibold">Cuestionario de bienestar</h2>
       </div>
       <div className="space-y-4">
@@ -68,7 +68,7 @@ export function WellnessForm() {
               onChange={(event) =>
                 setValues((current) => ({ ...current, [slider.key]: Number(event.target.value) }))
               }
-              className="w-full accent-[#FB923C]"
+              className="w-full accent-brand"
             />
           </label>
         ))}
@@ -86,7 +86,7 @@ export function WellnessForm() {
           Enviar bienestar
         </button>
         {sent && (
-          <p className="rounded-xl border border-[#FB923C]/25 bg-[#FB923C]/10 px-3 py-2 text-xs text-[#FB923C]">
+          <p className="rounded-xl border border-brand/25 bg-brand/10 px-3 py-2 text-xs text-brand">
             Cuestionario enviado. Tu entrenador lo verá en tu historial.
           </p>
         )}
