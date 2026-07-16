@@ -54,7 +54,7 @@ export function NutritionPanel() {
   return (
     <div className="glass-card rounded-2xl p-5">
       <div className="mb-4 flex items-center gap-2">
-        <Utensils className="h-4 w-4 text-[#FB923C]" />
+        <Utensils className="h-4 w-4 text-brand" />
         <h2 className="text-sm font-semibold">Plan nutricional de hoy</h2>
       </div>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
@@ -62,7 +62,7 @@ export function NutritionPanel() {
           <div key={meal.name} className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4">
             <p className="text-sm font-semibold text-white">{meal.name}</p>
             <p className="mt-2 text-xs leading-relaxed text-[#94A3B8]">{meal.content}</p>
-            <p className="mt-3 text-xs font-medium text-[#FB923C]">{meal.macros}</p>
+            <p className="mt-3 text-xs font-medium text-brand">{meal.macros}</p>
           </div>
         ))}
       </div>
