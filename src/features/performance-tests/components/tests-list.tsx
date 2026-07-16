@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { HeartPulse, Scale, Trash2 } from 'lucide-react'
+import { Activity, HeartPulse, MoveVertical, Ruler, Scale, Sparkles, Trash2 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
-import { categoriaLabel, type PerformanceTest } from '@/features/performance-tests/data'
+import { categoriaLabel, type PerformanceTest, type TestCategoria } from '@/features/performance-tests/data'
 import { deletePerformanceTest } from '@/features/performance-tests/services/actions'
 import { TestForm } from '@/features/performance-tests/components/test-form'
 import { toneForPain, toneForStress, type WellnessCheck } from '@/features/wellness/data'
@@ -13,6 +13,14 @@ const toneClass = {
   medium: 'text-[#FFB000]',
   high: 'text-[#F87171]',
 } as const
+
+const categoriaIcon: Record<TestCategoria, typeof Scale> = {
+  fuerza: Scale,
+  resistencia: Activity,
+  flexibilidad: MoveVertical,
+  medidas: Ruler,
+  otro: Sparkles,
+}
 
 interface TestsListProps {
   clienteId: string
@@ -45,10 +53,14 @@ export function TestsList({ clienteId, tests, wellnessHistory, adherencia }: Tes
         </p>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {items.map((test) => (
+          {items.map((test) => {
+            const CategoriaIcon = categoriaIcon[test.categoria]
+            return (
             <div key={test.id} className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
               <div className="mb-3 flex items-start justify-between">
-                <Scale className="h-5 w-5 text-[#FF6A00]" />
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FF6A00]/10 text-[#FF6A00]">
+                  <CategoriaIcon className="h-4 w-4" />
+                </span>
                 <button
                   type="button"
                   onClick={() => handleDelete(test.id)}
@@ -63,7 +75,8 @@ export function TestsList({ clienteId, tests, wellnessHistory, adherencia }: Tes
               <p className="mt-1 text-2xl font-black text-white">{test.valor} {test.unidad}</p>
               <p className="mt-1 text-xs text-[#94A3B8]">{new Date(test.fechaTest).toLocaleDateString('es-ES')}</p>
             </div>
-          ))}
+            )
+          })}
         </div>
       )}
 
@@ -79,7 +92,7 @@ export function TestsList({ clienteId, tests, wellnessHistory, adherencia }: Tes
 
       <div className="mt-6">
         <div className="mb-3 flex items-center gap-2">
-          <HeartPulse className="h-4 w-4 text-[#FB923C]" />
+          <HeartPulse className="h-4 w-4 text-[#FF6A00]" />
           <h3 className="text-sm font-bold text-white">Bienestar reciente</h3>
         </div>
         {wellnessHistory.length === 0 ? (

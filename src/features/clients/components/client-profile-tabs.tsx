@@ -5,8 +5,14 @@ import Link from 'next/link'
 import {
   ArrowRight,
   CheckCircle2,
+  Droplets,
   Dumbbell,
+  Flame,
+  Footprints,
+  LayoutGrid,
+  BadgeEuro,
   MessageSquare,
+  TrendingUp,
   Utensils,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
@@ -14,7 +20,7 @@ import {
   clientTimeline,
   type ClientRecord,
 } from '@/features/clients/data'
-import type { PaymentRecord } from '@/features/payments/types'
+import type { PaymentRecord, PaymentStatus } from '@/features/payments/types'
 import type { PerformanceTest } from '@/features/performance-tests/data'
 import { TestsList } from '@/features/performance-tests/components/tests-list'
 import type { WellnessCheck } from '@/features/wellness/data'
@@ -24,7 +30,14 @@ import { ClientBioCard } from '@/features/clients/components/client-bio-card'
 
 type ClientTab = 'Resumen' | 'Entrenamiento' | 'Nutrición' | 'Progreso' | 'Pagos' | 'Mensajes'
 
-const tabs: ClientTab[] = ['Resumen', 'Entrenamiento', 'Nutrición', 'Progreso', 'Pagos', 'Mensajes']
+const tabs: { id: ClientTab; icon: typeof LayoutGrid }[] = [
+  { id: 'Resumen', icon: LayoutGrid },
+  { id: 'Entrenamiento', icon: Dumbbell },
+  { id: 'Nutrición', icon: Utensils },
+  { id: 'Progreso', icon: TrendingUp },
+  { id: 'Pagos', icon: BadgeEuro },
+  { id: 'Mensajes', icon: MessageSquare },
+]
 
 const workoutPlan = [
   { day: 'Lunes', title: 'Fuerza torso + core', status: 'Completado', detail: '4 ejercicios · 45 min · RPE medio 7' },
@@ -32,11 +45,17 @@ const workoutPlan = [
   { day: 'Viernes', title: 'Full body técnico', status: 'Programado', detail: '4 ejercicios · 40 min · tempo controlado' },
 ]
 
+const workoutStatusTone: Record<string, string> = {
+  Completado: 'border-[#FF6A00]/25 bg-[#FF6A00]/10 text-[#FF6A00]',
+  Pendiente: 'border-[#FFB000]/25 bg-[#FFB000]/10 text-[#FFB000]',
+  Programado: 'border-white/15 bg-white/[0.05] text-[#94A3B8]',
+}
+
 const nutritionItems = [
-  { label: 'Calorías objetivo', value: '2.150 kcal', note: 'Promedio semanal' },
-  { label: 'Proteína', value: '150 g', note: 'Objetivo diario' },
-  { label: 'Pasos', value: '8.000', note: 'Mínimo diario' },
-  { label: 'Agua', value: '2,5 L', note: 'Hidratación' },
+  { icon: Flame, label: 'Calorías objetivo', value: '2.150 kcal', note: 'Promedio semanal' },
+  { icon: Dumbbell, label: 'Proteína', value: '150 g', note: 'Objetivo diario' },
+  { icon: Footprints, label: 'Pasos', value: '8.000', note: 'Mínimo diario' },
+  { icon: Droplets, label: 'Agua', value: '2,5 L', note: 'Hidratación' },
 ]
 
 const messages = [
@@ -44,6 +63,12 @@ const messages = [
   { from: 'Coach', text: 'Sí, sube 2 kg si mantienes técnica y no aparece molestia.', time: 'Hace 1 h' },
   { from: 'Cliente', text: 'Perfecto, lo pruebo en la segunda serie.', time: 'Hace 48 min' },
 ]
+
+const paymentStatusTone: Record<PaymentStatus, string> = {
+  Pagado: 'border-[#FF6A00]/25 bg-[#FF6A00]/10 text-[#FF6A00]',
+  Pendiente: 'border-[#FFB000]/25 bg-[#FFB000]/10 text-[#FFB000]',
+  Vencido: 'border-[#F87171]/25 bg-[#F87171]/10 text-[#F87171]',
+}
 
 interface ClientProfileTabsProps {
   client: ClientRecord
@@ -58,21 +83,25 @@ export function ClientProfileTabs({ client, payments, tests, wellnessHistory, ai
 
   return (
     <div className="space-y-5">
-      <div className="overflow-x-auto rounded-2xl border border-white/[0.08] bg-white/[0.03] p-1">
+      <div className="overflow-x-auto border-b border-white/[0.08]">
         <div className="flex min-w-max gap-1">
           {tabs.map((tab) => (
             <button
-              key={tab}
+              key={tab.id}
               type="button"
-              onClick={() => setActiveTab(tab)}
+              onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'rounded-xl px-4 py-2.5 text-sm font-bold transition',
-                activeTab === tab
-                  ? 'bg-[#FF6A00] text-[#0D1117]'
-                  : 'text-[#94A3B8] hover:bg-white/[0.06] hover:text-white'
+                'relative flex items-center gap-2 px-4 py-3 text-sm font-bold transition',
+                activeTab === tab.id
+                  ? 'text-[#FF6A00]'
+                  : 'text-[#94A3B8] hover:text-white'
               )}
             >
-              {tab}
+              <tab.icon className="h-4 w-4" />
+              {tab.id}
+              {activeTab === tab.id && (
+                <span className="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-[#FF6A00]" />
+              )}
             </button>
           ))}
         </div>
@@ -82,10 +111,11 @@ export function ClientProfileTabs({ client, payments, tests, wellnessHistory, ai
         <div className="grid gap-6 xl:grid-cols-[1fr_0.75fr]">
           <section className="glass-card rounded-2xl p-5">
             <h2 className="mb-4 text-sm font-bold text-white">Actividad y seguimiento</h2>
-            <div className="space-y-3">
+            <div className="relative space-y-3">
+              <span className="absolute bottom-4 left-[21px] top-4 w-px bg-white/[0.08]" aria-hidden />
               {clientTimeline.map((item) => (
-                <div key={`${item.title}-${item.time}`} className="flex gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#FF6A00]/10 text-[#FF6A00]">
+                <div key={`${item.title}-${item.time}`} className="relative flex gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
+                  <span className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#FF6A00]/10 text-[#FF6A00] ring-4 ring-[#0D1117]">
                     <item.icon className="h-4 w-4" />
                   </span>
                   <div className="min-w-0 flex-1">
@@ -135,8 +165,12 @@ export function ClientProfileTabs({ client, payments, tests, wellnessHistory, ai
             {workoutPlan.map((item) => (
               <div key={item.day} className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
                 <div className="mb-4 flex items-start justify-between gap-3">
-                  <Dumbbell className="h-5 w-5 text-[#FF6A00]" />
-                  <span className="rounded-full bg-white/[0.05] px-2.5 py-1 text-xs font-bold text-[#C8D2E3]">{item.status}</span>
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FF6A00]/10 text-[#FF6A00]">
+                    <Dumbbell className="h-4 w-4" />
+                  </span>
+                  <span className={cn('rounded-full border px-2.5 py-1 text-xs font-bold', workoutStatusTone[item.status])}>
+                    {item.status}
+                  </span>
                 </div>
                 <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#475569]">{item.day}</p>
                 <h3 className="mt-1 text-base font-bold text-white">{item.title}</h3>
@@ -154,11 +188,14 @@ export function ClientProfileTabs({ client, payments, tests, wellnessHistory, ai
               <h2 className="text-sm font-bold text-white">Objetivos nutricionales</h2>
               <p className="text-xs text-[#94A3B8]">Seguimiento diario conectado al check-in.</p>
             </div>
-            <Utensils className="h-5 w-5 text-[#FFB000]" />
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FFB000]/10 text-[#FFB000]">
+              <Utensils className="h-4 w-4" />
+            </span>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {nutritionItems.map((item) => (
               <div key={item.label} className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
+                <item.icon className="mb-2 h-4 w-4 text-[#FFB000]" />
                 <p className="text-xs text-[#475569]">{item.label}</p>
                 <p className="mt-1 text-2xl font-black text-white">{item.value}</p>
                 <p className="mt-1 text-xs text-[#94A3B8]">{item.note}</p>
@@ -202,7 +239,9 @@ export function ClientProfileTabs({ client, payments, tests, wellnessHistory, ai
                   <span className="text-sm font-black text-[#FFB000]">
                     {new Intl.NumberFormat('es-ES', { style: 'currency', currency: payment.currency }).format(payment.amount)}
                   </span>
-                  <span className="rounded-full bg-white/[0.05] px-2.5 py-1 text-xs font-bold text-[#C8D2E3]">{payment.statusLabel}</span>
+                  <span className={cn('rounded-full border px-2.5 py-1 text-xs font-bold', paymentStatusTone[payment.status])}>
+                    {payment.statusLabel}
+                  </span>
                 </div>
               </div>
             ))}
@@ -226,15 +265,35 @@ export function ClientProfileTabs({ client, payments, tests, wellnessHistory, ai
             </Link>
           </div>
           <div className="space-y-3">
-            {messages.map((message) => (
-              <div key={`${message.from}-${message.time}`} className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
-                <div className="mb-2 flex items-center justify-between gap-3">
-                  <span className="text-xs font-bold text-[#FF6A00]">{message.from}</span>
-                  <span className="text-xs text-[#475569]">{message.time}</span>
+            {messages.map((message) => {
+              const isCoach = message.from === 'Coach'
+              return (
+                <div key={`${message.from}-${message.time}`} className={cn('flex gap-3', isCoach && 'flex-row-reverse')}>
+                  <span
+                    className={cn(
+                      'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px] font-black',
+                      isCoach ? 'bg-[#FF6A00]/15 text-[#FF6A00]' : 'bg-white/[0.08] text-[#C8D2E3]'
+                    )}
+                  >
+                    {isCoach ? 'C' : client.initials}
+                  </span>
+                  <div
+                    className={cn(
+                      'max-w-[80%] rounded-2xl border p-4',
+                      isCoach
+                        ? 'border-[#FF6A00]/20 bg-[#FF6A00]/10 text-right'
+                        : 'border-white/[0.06] bg-white/[0.03]'
+                    )}
+                  >
+                    <div className={cn('mb-2 flex items-center gap-3', isCoach ? 'flex-row-reverse justify-start' : 'justify-between')}>
+                      <span className={cn('text-xs font-bold', isCoach ? 'text-[#FF6A00]' : 'text-[#C8D2E3]')}>{message.from}</span>
+                      <span className="text-xs text-[#475569]">{message.time}</span>
+                    </div>
+                    <p className="text-sm text-white">{message.text}</p>
+                  </div>
                 </div>
-                <p className="text-sm text-white">{message.text}</p>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </section>
       )}

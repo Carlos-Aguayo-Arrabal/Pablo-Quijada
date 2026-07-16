@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Pencil } from 'lucide-react'
+import { Cake, HeartPulse, Pencil, Ruler, Weight } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 import { getLevelTone, type ClientRecord } from '@/features/clients/data'
 import { EditClientBioModal } from '@/features/clients/components/edit-client-bio-modal'
@@ -10,10 +10,10 @@ export function ClientBioCard({ client }: { client: ClientRecord }) {
   const [isEditing, setIsEditing] = useState(false)
 
   const stats = [
-    { label: 'Edad', value: client.age ? `${client.age} años` : '—' },
-    { label: 'FC máx', value: client.maxHeartRate ? `${client.maxHeartRate} ppm` : '—' },
-    { label: 'Altura', value: client.height ? `${client.height} cm` : '—' },
-    { label: 'Peso', value: client.weight && client.weight !== '—' ? client.weight : '—' },
+    { icon: Cake, label: 'Edad', value: client.age ? `${client.age} años` : '—' },
+    { icon: HeartPulse, label: 'FC máx', value: client.maxHeartRate ? `${client.maxHeartRate} ppm` : '—' },
+    { icon: Ruler, label: 'Altura', value: client.height ? `${client.height} cm` : '—' },
+    { icon: Weight, label: 'Peso', value: client.weight && client.weight !== '—' ? client.weight : '—' },
   ]
 
   return (
@@ -40,6 +40,7 @@ export function ClientBioCard({ client }: { client: ClientRecord }) {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {stats.map((stat) => (
           <div key={stat.label} className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
+            <stat.icon className="mb-1.5 h-3.5 w-3.5 text-[#FF6A00]" />
             <p className="text-xs text-[#475569]">{stat.label}</p>
             <p className="mt-1 text-sm font-bold text-white">{stat.value}</p>
           </div>

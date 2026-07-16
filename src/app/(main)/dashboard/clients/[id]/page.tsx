@@ -9,7 +9,7 @@ import {
   MessageSquare,
   Phone,
 } from 'lucide-react'
-import { clientMetrics, getAdherenceTone, getStatusTone } from '@/features/clients/data'
+import { clientMetrics, getAdherenceTone, getLevelTone, getStatusTone } from '@/features/clients/data'
 import { getClientById } from '@/features/clients/services/actions'
 import { ClientProfileTabs } from '@/features/clients/components/client-profile-tabs'
 import { ClientGroupEditor } from '@/features/clients/components/client-group-editor'
@@ -45,23 +45,35 @@ export default async function ClientDetailPage({
         Volver a clientes
       </Link>
 
-      <section className="mb-6 rounded-2xl border border-[#FF6A00]/20 bg-gradient-to-br from-[#FF6A00]/12 to-[#FFB000]/10 p-5 lg:p-6">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+      <section className="relative mb-6 overflow-hidden rounded-2xl border border-[#FF6A00]/20 bg-gradient-to-br from-[#FF6A00]/12 to-[#FFB000]/10 p-5 lg:p-6">
+        <div
+          className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full opacity-20 blur-[90px]"
+          style={{ background: '#FF6A00' }}
+        />
+        <div className="relative flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#0D1117] text-xl font-black text-[#FF6A00] ring-1 ring-white/10">
+            <div className="relative flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-full bg-[#0D1117] text-xl font-black text-[#FF6A00] ring-2 ring-[#FF6A00]/40">
               {client.initials}
+              <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-[#0D1117] bg-[#FF6A00]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#0D1117]" />
+              </span>
             </div>
             <div>
               <div className="mb-2 flex flex-wrap items-center gap-2">
                 <span className={cn('rounded-full border px-3 py-1 text-xs font-bold', getStatusTone(client.status))}>
                   {client.status}
                 </span>
+                {client.level && (
+                  <span className={cn('rounded-full border px-3 py-1 text-xs font-bold', getLevelTone(client.level))}>
+                    {client.level}
+                  </span>
+                )}
                 <span className="rounded-full bg-white/[0.06] px-3 py-1 text-xs font-semibold text-[#C8D2E3]">
                   Portal activo
                 </span>
                 <ClientGroupEditor clientId={client.id} initialGroup={client.group} />
               </div>
-              <h1 className="text-3xl font-black text-white">{client.name}</h1>
+              <h1 className="text-3xl font-black tracking-tight text-white">{client.name}</h1>
               <p className="mt-1 max-w-2xl text-sm text-[#94A3B8]">{client.goal}</p>
               <div className="mt-4 flex flex-wrap gap-3 text-xs text-[#94A3B8]">
                 <span className="inline-flex items-center gap-1.5"><Mail className="h-3.5 w-3.5 text-[#FF6A00]" />{client.email}</span>
@@ -94,8 +106,10 @@ export default async function ClientDetailPage({
           const tone = item.key === 'adherence' ? getAdherenceTone(client.adherence) : 'text-white'
 
           return (
-            <div key={item.label} className="glass-card rounded-2xl p-4">
-              <item.icon className="mb-3 h-5 w-5 text-[#FF6A00]" />
+            <div key={item.label} className="glass-card group rounded-2xl p-4 transition hover:border-[#FF6A00]/25">
+              <span className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#FF6A00]/10 text-[#FF6A00] transition group-hover:bg-[#FF6A00]/15">
+                <item.icon className="h-4 w-4" />
+              </span>
               <p className={cn('text-2xl font-black', tone)}>{value}</p>
               <p className="text-xs text-[#94A3B8]">{item.label}</p>
             </div>
