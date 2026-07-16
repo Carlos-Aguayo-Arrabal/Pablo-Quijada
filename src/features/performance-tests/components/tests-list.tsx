@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useTransition } from 'react'
-import { Activity, HeartPulse, MoveVertical, Ruler, Scale, Sparkles, Trash2 } from 'lucide-react'
+import { useMemo, useState, useTransition } from 'react'
+import { Activity, HeartPulse, MoveVertical, Ruler, Scale, Sparkles, TrendingDown, TrendingUp, Trash2 } from 'lucide-react'
+import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { cn } from '@/shared/lib/utils'
 import { categoriaLabel, type PerformanceTest, type TestCategoria } from '@/features/performance-tests/data'
 import { deletePerformanceTest } from '@/features/performance-tests/services/actions'
@@ -40,6 +41,36 @@ export function TestsList({ clienteId, tests, wellnessHistory, adherencia }: Tes
     })
   }
 
+  const trends = useMemo(() => {
+    const groups = new Map<string, PerformanceTest[]>()
+    for (const test of items) {
+      const key = `${test.categoria}__${test.nombre}`
+      const bucket = groups.get(key) ?? []
+      bucket.push(test)
+      groups.set(key, bucket)
+    }
+    return Array.from(groups.values())
+      .map((group) => [...group].sort((a, b) => new Date(a.fechaTest).getTime() - new Date(b.fechaTest).getTime()))
+      .filter((group) => group.length >= 2)
+      .map((group) => {
+        const first = group[0]
+        const last = group[group.length - 1]
+        const delta = Math.round((last.valor - first.valor) * 100) / 100
+        return {
+          key: `${last.categoria}__${last.nombre}`,
+          nombre: last.nombre,
+          categoria: last.categoria,
+          unidad: last.unidad,
+          latest: last.valor,
+          delta,
+          data: group.map((t) => ({
+            fecha: new Date(t.fechaTest).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }),
+            valor: t.valor,
+          })),
+        }
+      })
+  }, [items])
+
   return (
     <section className="glass-card rounded-2xl p-5">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -77,6 +108,68 @@ export function TestsList({ clienteId, tests, wellnessHistory, adherencia }: Tes
             </div>
             )
           })}
+        </div>
+      )}
+
+      {trends.length > 0 && (
+        <div className="mt-6">
+          <h3 className="mb-3 text-sm font-bold text-white">Marcas y evolución</h3>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {trends.map((trend) => {
+              const isUp = trend.delta > 0
+              const isDown = trend.delta < 0
+              return (
+                <div key={trend.key} className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
+                  <div className="mb-1 flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs text-[#475569]">{categoriaLabel(trend.categoria)} · {trend.nombre}</p>
+                      <p className="mt-1 text-2xl font-black text-white">
+                        {trend.latest} <span className="text-sm font-bold text-[#94A3B8]">{trend.unidad}</span>
+                      </p>
+                    </div>
+                    {trend.delta !== 0 && (
+                      <span
+                        className={cn(
+                          'inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-1 text-xs font-bold',
+                          isUp && 'border-[#FF6A00]/25 bg-[#FF6A00]/10 text-[#FF6A00]',
+                          isDown && 'border-[#F87171]/25 bg-[#F87171]/10 text-[#F87171]'
+                        )}
+                      >
+                        {isUp ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                        {isUp ? '+' : ''}{trend.delta} {trend.unidad}
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-3 h-24 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={trend.data} margin={{ top: 4, right: 4, bottom: 0, left: 4 }}>
+                        <XAxis dataKey="fecha" hide />
+                        <YAxis domain={['dataMin', 'dataMax']} hide />
+                        <Tooltip
+                          contentStyle={{
+                            background: '#0D1117',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: 8,
+                            fontSize: 12,
+                          }}
+                          labelStyle={{ color: '#94A3B8' }}
+                          itemStyle={{ color: '#FF6A00' }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="valor"
+                          stroke="#FF6A00"
+                          strokeWidth={2}
+                          dot={{ r: 3, fill: '#FF6A00', strokeWidth: 0 }}
+                          activeDot={{ r: 4 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
       )}
 
