@@ -1,8 +1,9 @@
 'use client'
 
-import { useMemo, useState, type CSSProperties } from 'react'
+import { useMemo, useState, useTransition, type CSSProperties } from 'react'
 import { Check, Plus } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
+import { createPhaseAction, updatePhaseAction } from '@/features/periodization/services/actions'
 
 export interface PhaseTimelineItem {
   id: string
@@ -14,14 +15,18 @@ interface PhaseTimelineProps {
   initialPhases: PhaseTimelineItem[]
   phases?: PhaseTimelineItem[]
   onPhasesChange?: (phases: PhaseTimelineItem[]) => void
+  planId?: string
+  programId?: string
 }
 
-export function PhaseTimeline({ initialPhases, phases: controlledPhases, onPhasesChange }: PhaseTimelineProps) {
+export function PhaseTimeline({ initialPhases, phases: controlledPhases, onPhasesChange, planId, programId }: PhaseTimelineProps) {
   const [localPhases, setLocalPhases] = useState(initialPhases)
   const phases = controlledPhases ?? localPhases
   const [editingId, setEditingId] = useState<string | null>(initialPhases[0]?.id ?? null)
   const editingPhase = phases.find((phase) => phase.id === editingId) ?? null
   const totalWeeks = useMemo(() => phases.reduce((sum, phase) => sum + phase.durationWeeks, 0), [phases])
+  const [isPending, startTransition] = useTransition()
+  const canPersist = Boolean(planId && programId && !programId.startsWith('demo-'))
 
   function setPhases(nextPhases: PhaseTimelineItem[]) {
     if (onPhasesChange) {
@@ -34,6 +39,15 @@ export function PhaseTimeline({ initialPhases, phases: controlledPhases, onPhase
 
   function updatePhase(id: string, patch: Partial<PhaseTimelineItem>) {
     setPhases(phases.map((phase) => phase.id === id ? { ...phase, ...patch } : phase))
+
+    if (canPersist && planId && programId) {
+      startTransition(() => {
+        void updatePhaseAction(planId, id, {
+          nombre: patch.name,
+          duracionSemanas: patch.durationWeeks,
+        })
+      })
+    }
   }
 
   function addPhase() {
@@ -45,6 +59,12 @@ export function PhaseTimeline({ initialPhases, phases: controlledPhases, onPhase
 
     setPhases([...phases, nextPhase])
     setEditingId(nextPhase.id)
+
+    if (canPersist && planId && programId) {
+      startTransition(() => {
+        void createPhaseAction(planId, programId)
+      })
+    }
   }
 
   return (
@@ -52,7 +72,7 @@ export function PhaseTimeline({ initialPhases, phases: controlledPhases, onPhase
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="text-sm font-bold text-white">Periodización</h2>
-          <p className="mt-1 text-xs text-[#94A3B8]">{phases.length} fases · {totalWeeks} semanas</p>
+          <p className="mt-1 text-xs text-[#94A3B8]">{phases.length} fases · {totalWeeks} semanas{isPending ? ' · guardando…' : ''}</p>
         </div>
         <button type="button" onClick={addPhase} className="btn-primary w-fit px-4 py-2 text-xs">
           <Plus className="h-4 w-4" />

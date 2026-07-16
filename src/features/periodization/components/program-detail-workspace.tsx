@@ -9,33 +9,61 @@ import { WeeklyWorkoutBuilder } from '@/features/periodization/components/weekly
 import {
   prescriptionTemplates,
   type ProgramClientOption,
-  type ProgramPhaseView,
 } from '@/features/periodization/data'
+import type { ProgramWorkspace } from '@/features/periodization/services/actions'
 
 interface ProgramDetailWorkspaceProps {
-  initialPhases: ProgramPhaseView[]
+  planId: string
+  workspace: ProgramWorkspace
   clients: ProgramClientOption[]
   initialAssignedClients: number
   initialAdherence: number
 }
 
 export function ProgramDetailWorkspace({
-  initialPhases,
+  planId,
+  workspace,
   clients,
   initialAssignedClients,
   initialAdherence,
 }: ProgramDetailWorkspaceProps) {
-  const [phases, setPhases] = useState(initialPhases)
+  const [syncedWorkspace, setSyncedWorkspace] = useState(workspace)
+  const [phases, setPhases] = useState(workspace.phases)
+
+  // Cuando una server action persiste un cambio y revalida la ruta, `workspace`
+  // llega con datos frescos de Supabase (ids reales de fases/semanas). Detectar el
+  // cambio de referencia durante el render y resincronizar ahí (en vez de en un
+  // efecto) evita el doble render que provoca `setState` síncrono dentro de un
+  // `useEffect`.
+  if (workspace !== syncedWorkspace) {
+    setSyncedWorkspace(workspace)
+    setPhases(workspace.phases)
+  }
+
+  function handlePhasesChange(next: { id: string; name: string; durationWeeks: number }[]) {
+    setPhases(next.map((phase) => ({
+      ...phase,
+      weeks: phases.find((existing) => existing.id === phase.id)?.weeks ?? [],
+    })))
+  }
 
   return (
     <div className="mb-6 space-y-6">
       <ProgramAssignmentControls
+        planId={planId}
+        programId={workspace.programId}
         clients={clients}
         initialAssignedClients={initialAssignedClients}
         initialAdherence={initialAdherence}
       />
-      <PhaseTimeline initialPhases={initialPhases} phases={phases} onPhasesChange={setPhases} />
-      <MonthlyProgramCalendar phases={phases} />
+      <PhaseTimeline
+        initialPhases={workspace.phases}
+        phases={phases}
+        onPhasesChange={handlePhasesChange}
+        planId={planId}
+        programId={workspace.programId}
+      />
+      <MonthlyProgramCalendar planId={planId} programId={workspace.programId} phases={phases} workoutsByWeek={workspace.workoutsByWeek} />
       <PrescriptionsPanel prescriptions={prescriptionTemplates} />
       <WeeklyWorkoutBuilder prescriptions={prescriptionTemplates} />
     </div>

@@ -128,6 +128,7 @@ export type Programa = {
   id: string
   entrenador_id: string
   cliente_id: string | null
+  plan_id: string | null
   nombre: string
   duracion_total_semanas: number
   estado: ProgramaEstado
@@ -408,7 +409,7 @@ export interface Database {
         Row: Programa
         Insert: Pick<Programa, 'entrenador_id' | 'nombre' | 'duracion_total_semanas'> &
           Partial<Omit<Programa, 'id' | 'entrenador_id' | 'nombre' | 'duracion_total_semanas' | 'creado_en' | 'actualizado_en'>>
-        Update: Partial<Omit<Programa, 'id' | 'creado_en'>>
+        Update: Partial<Omit<Programa, 'id' | 'creado_en' | 'actualizado_en'>>
         Relationships: [
           {
             foreignKeyName: 'programas_entrenador_id_fkey'

@@ -15,37 +15,15 @@ import {
   estimateExerciseSeconds,
   formatDuration,
   getCategoryTone,
-  type WorkoutCategory,
 } from '@/features/workouts/data'
 import { ProgramDetailWorkspace } from '@/features/periodization/components/program-detail-workspace'
-import type { ProgramPhaseView } from '@/features/periodization/data'
+import { getProgramWorkspace } from '@/features/periodization/services/actions'
 import { listClients } from '@/features/clients/services/actions'
 import { getWorkoutPlanById } from '@/features/workouts/services/actions'
 import { cn } from '@/shared/lib/utils'
 
 export const metadata: Metadata = {
   title: 'Detalle del plan',
-}
-
-const phaseNames: Record<WorkoutCategory, string[]> = {
-  Fuerza: ['General Strength', 'Intensificación', 'Realización'],
-  Hipertrofia: ['Volumen base', 'Sobrecarga', 'Especialización'],
-  'Pérdida de grasa': ['Base metabólica', 'Densidad', 'Consolidación'],
-  Readaptación: ['Control motor', 'Fuerza progresiva', 'Retorno'],
-  Nutrición: ['Adherencia', 'Ajuste', 'Consolidación'],
-}
-
-function createInitialPhases(category: WorkoutCategory, totalWeeks: number): ProgramPhaseView[] {
-  const names = phaseNames[category]
-  const phaseCount = Math.min(3, Math.max(1, totalWeeks))
-  const baseWeeks = Math.floor(totalWeeks / phaseCount)
-  const extraWeeks = totalWeeks % phaseCount
-
-  return Array.from({ length: phaseCount }, (_, index) => ({
-    id: `phase-${index + 1}`,
-    name: names[index] ?? `Fase ${index + 1}`,
-    durationWeeks: baseWeeks + (index < extraWeeks ? 1 : 0),
-  }))
 }
 
 export default async function PlanDetailPage({
@@ -61,7 +39,7 @@ export default async function PlanDetailPage({
     (sum, day) => sum + day.exercises.reduce((daySum, exercise) => daySum + estimateExerciseSeconds(exercise), 0),
     0
   )
-  const initialPhases = createInitialPhases(plan.category, plan.durationWeeks)
+  const workspace = await getProgramWorkspace(id, plan.category, plan.durationWeeks)
 
   return (
     <div className="mx-auto max-w-7xl p-5 lg:p-8">
@@ -105,7 +83,8 @@ export default async function PlanDetailPage({
       </div>
 
       <ProgramDetailWorkspace
-        initialPhases={initialPhases}
+        planId={id}
+        workspace={workspace}
         clients={clients.map((client) => ({ id: client.id, name: client.name }))}
         initialAssignedClients={plan.assignedClients}
         initialAdherence={plan.adherence}
