@@ -79,7 +79,7 @@ export function ExerciseTimer({ exercise }: { exercise: ClientPlanExercise }) {
             type="button"
             onClick={() => setIsRunning((value) => !value)}
             disabled={remainingSeconds === 0}
-            className="flex h-9 min-w-24 items-center justify-center gap-2 rounded-full bg-brand px-3 text-xs font-bold text-[#080C14] disabled:opacity-50"
+            className="flex h-11 min-w-24 items-center justify-center gap-2 rounded-full bg-brand px-4 text-xs font-bold text-[#080C14] disabled:opacity-50"
           >
             {isRunning ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
             {isRunning ? 'Pausar' : 'Iniciar'}
@@ -87,7 +87,7 @@ export function ExerciseTimer({ exercise }: { exercise: ClientPlanExercise }) {
           <button
             type="button"
             onClick={resetTimer}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.1] text-[#94A3B8] hover:text-white"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/[0.1] text-[#94A3B8] hover:text-white"
             aria-label="Reiniciar temporizador"
           >
             <RotateCcw className="h-3.5 w-3.5" />

@@ -73,7 +73,7 @@ export function BookSessionPanel({ initialSlots, initialMySessions }: BookSessio
                 <button
                   type="button"
                   onClick={() => handleCancel(session.id)}
-                  className="text-[#475569] hover:text-[#F87171]"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center text-[#475569] hover:text-[#F87171]"
                   aria-label="Cancelar cita"
                 >
                   <X className="h-4 w-4" />
@@ -94,7 +94,7 @@ export function BookSessionPanel({ initialSlots, initialMySessions }: BookSessio
         <button
           type="button"
           onClick={() => setModalidad('presencial')}
-          className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold ${modalidad === 'presencial' ? 'bg-brand text-[#080C14]' : 'bg-white/[0.05] text-[#94A3B8]'}`}
+          className={`flex h-11 items-center gap-1.5 rounded-lg px-3 text-xs font-semibold ${modalidad === 'presencial' ? 'bg-brand text-[#080C14]' : 'bg-white/[0.05] text-[#94A3B8]'}`}
         >
           <MapPin className="h-3.5 w-3.5" />
           Presencial
@@ -102,7 +102,7 @@ export function BookSessionPanel({ initialSlots, initialMySessions }: BookSessio
         <button
           type="button"
           onClick={() => setModalidad('online')}
-          className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold ${modalidad === 'online' ? 'bg-brand text-[#080C14]' : 'bg-white/[0.05] text-[#94A3B8]'}`}
+          className={`flex h-11 items-center gap-1.5 rounded-lg px-3 text-xs font-semibold ${modalidad === 'online' ? 'bg-brand text-[#080C14]' : 'bg-white/[0.05] text-[#94A3B8]'}`}
         >
           <Video className="h-3.5 w-3.5" />
           Online
@@ -112,7 +112,7 @@ export function BookSessionPanel({ initialSlots, initialMySessions }: BookSessio
       {slots.length === 0 ? (
         <p className="text-sm text-[#94A3B8]">Tu entrenador todavía no ha abierto huecos disponibles.</p>
       ) : (
-        <div className="grid max-h-64 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3">
+        <div className="grid max-h-64 grid-cols-2 gap-2 overflow-y-auto overscroll-contain sm:grid-cols-3">
           {slots.map((slot) => {
             const date = new Date(slot.fechaHora)
             const isBooking = bookingSlot === slot.fechaHora
@@ -122,7 +122,7 @@ export function BookSessionPanel({ initialSlots, initialMySessions }: BookSessio
                 type="button"
                 onClick={() => handleBook(slot)}
                 disabled={isBooking}
-                className="rounded-lg border border-white/[0.08] bg-white/[0.03] px-2 py-2 text-left text-xs text-white hover:border-brand/40 hover:bg-brand/10 disabled:opacity-60"
+                className="min-h-11 rounded-lg border border-white/[0.08] bg-white/[0.03] px-2 py-2.5 text-left text-xs text-white hover:border-brand/40 hover:bg-brand/10 disabled:opacity-60"
               >
                 {isBooking ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />

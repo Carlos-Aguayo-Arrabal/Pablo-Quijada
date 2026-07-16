@@ -38,7 +38,7 @@ export function CoachChat({ initialMessages }: { initialMessages: MyMessage[] })
         <MessageSquare className="h-4 w-4 text-brand2" />
         <h2 className="text-sm font-semibold">Mensajes con tu entrenador</h2>
       </div>
-      <div className="mb-3 max-h-64 space-y-2 overflow-y-auto">
+      <div className="mb-3 max-h-64 space-y-2 overflow-y-auto overscroll-contain">
         {messages.length === 0 && (
           <p className="rounded-xl bg-white/[0.03] p-3 text-xs text-[#94A3B8]">
             Todavía no hay mensajes. Escribe la primera duda.
@@ -66,6 +66,7 @@ export function CoachChat({ initialMessages }: { initialMessages: MyMessage[] })
               handleSend()
             }
           }}
+          enterKeyHint="send"
           className="input-field"
           placeholder="Escribe una duda..."
         />

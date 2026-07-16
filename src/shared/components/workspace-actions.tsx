@@ -125,7 +125,7 @@ export function WorkspaceActions({
           aria-label={`Notificaciones${unreadCount > 0 ? `, ${unreadCount} sin leer` : ''}`}
           title="Notificaciones"
           className={cn(
-            'relative flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-[#94A3B8] transition hover:border-brand/40 hover:text-white',
+            'relative flex h-11 w-11 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-[#94A3B8] transition hover:border-brand/40 hover:text-white',
             activePanel === 'notifications' && 'border-brand/40 bg-brand/10 text-brand'
           )}
         >
@@ -154,13 +154,14 @@ export function WorkspaceActions({
             <button
               type="button"
               onClick={() => setActivePanel(null)}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-[#94A3B8] hover:bg-white/[0.06] hover:text-white"
+              className="flex h-11 w-11 items-center justify-center rounded-lg text-[#94A3B8] hover:bg-white/[0.06] hover:text-white"
               aria-label="Cerrar panel"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
 
+          <div className="max-h-[70vh] overflow-y-auto overscroll-contain">
           {activePanel === 'help' && (
             <div className="space-y-3 p-4">
               <HelpItem title={mode === 'admin' ? 'Centro de ayuda para coaches' : 'Ayuda del portal cliente'} detail={mode === 'admin' ? 'Guías para crear programas, gestionar pagos y responder check-ins.' : 'Consulta cómo completar entrenamientos, check-ins y hábitos.'} />
@@ -277,6 +278,7 @@ export function WorkspaceActions({
               )}
             </div>
           )}
+          </div>
         </div>
       )}
     </div>
@@ -301,7 +303,7 @@ function ActionButton({
       aria-label={label}
       title={label}
       className={cn(
-        'flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-[#94A3B8] transition hover:border-brand/40 hover:text-white',
+        'flex h-11 w-11 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-[#94A3B8] transition hover:border-brand/40 hover:text-white',
         active && 'border-brand/40 bg-brand/10 text-brand'
       )}
     >
