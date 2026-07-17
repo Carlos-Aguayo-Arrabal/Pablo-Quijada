@@ -297,6 +297,32 @@ async function storeMealImageBytes(
 // Opción gratuita y por defecto: busca una foto de dominio público (CC0) en
 // Openverse (openverse.org, API pública sin necesidad de clave) a partir del
 // nombre de la comida. Sin coste, sin claves nuevas que configurar.
+// Openverse indexa sobre todo contenido en inglés: "Desayuno" no encuentra
+// nada aunque exista de sobra para "breakfast". Traducimos los tipos de
+// comida habituales y, si no reconocemos el nombre, caemos a una búsqueda
+// genérica de comida apetitosa en vez de fallar — la vía gratuita nunca debe
+// quedarse sin resultado.
+const MEAL_TYPE_TRANSLATIONS: Record<string, string> = {
+  desayuno: 'breakfast',
+  comida: 'lunch',
+  almuerzo: 'lunch',
+  cena: 'dinner',
+  merienda: 'snack',
+  snack: 'snack',
+  postre: 'dessert',
+  batido: 'smoothie',
+  ensalada: 'salad',
+}
+
+function stockSearchQueryFor(mealName: string) {
+  const normalized = mealName
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .trim()
+  return MEAL_TYPE_TRANSLATIONS[normalized] ?? 'healthy food plate'
+}
+
 export async function searchMealStockImage(clienteId: string, mealId: string, query: string) {
   if (await isDemoSession()) return { error: 'No disponible en la sesión de demostración.' }
   if (!query.trim()) return { error: 'Escribe primero el nombre de la comida.' }
@@ -306,7 +332,7 @@ export async function searchMealStockImage(clienteId: string, mealId: string, qu
   if (userError || !user) return { error: 'No autenticado.' }
 
   const searchUrl = `https://api.openverse.org/v1/images/?${new URLSearchParams({
-    q: `${query} food plate`,
+    q: stockSearchQueryFor(query),
     license: 'cc0,pdm',
     category: 'photograph',
     page_size: '1',
