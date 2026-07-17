@@ -5,12 +5,14 @@ import { signout } from '@/actions/auth'
 import { WorkspaceActions } from '@/shared/components/workspace-actions'
 import { ClientDemoBanner } from '@/features/client/components/client-demo-banner'
 import { TodayWorkoutPanel } from '@/features/client/components/today-workout-panel'
-import { HabitsPanel, NutritionPanel } from '@/features/client/components/habits-panel'
+import { HabitsPanel } from '@/features/client/components/habits-panel'
+import { NutritionPanelClient } from '@/features/nutrition/components/nutrition-panel-client'
 import { CheckinForm } from '@/features/client/components/checkin-form'
 import { CoachChat } from '@/features/client/components/coach-chat'
 import { WellnessForm } from '@/features/wellness/components/wellness-form'
 import { BookSessionPanel } from '@/features/client/components/book-session-panel'
 import type { AvailableSlot, ClientPlan, MyMessage, MyProfile, MySession } from '@/features/client/types'
+import type { NutritionPlanView } from '@/features/nutrition/services/actions'
 
 function initialsFor(name: string) {
   return name
@@ -27,6 +29,7 @@ interface ClientPortalViewProps {
   initialMessages: MyMessage[]
   availableSlots: AvailableSlot[]
   mySessions: MySession[]
+  nutritionPlan: NutritionPlanView | null
   isDemo: boolean
 }
 
@@ -36,6 +39,7 @@ export function ClientPortalView({
   initialMessages,
   availableSlots,
   mySessions,
+  nutritionPlan,
   isDemo,
 }: ClientPortalViewProps) {
   return (
@@ -100,7 +104,7 @@ export function ClientPortalView({
         <section className="grid grid-cols-1 gap-6 lg:grid-cols-[1.15fr_0.85fr]">
           <div className="space-y-6">
             <TodayWorkoutPanel plan={plan} />
-            <NutritionPanel />
+            <NutritionPanelClient plan={nutritionPlan} />
           </div>
 
           <div className="space-y-6">

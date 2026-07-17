@@ -6,15 +6,17 @@ import {
   listMyMessages,
   listMySessions,
 } from '@/features/client/services/actions'
+import { getMyNutritionPlan } from '@/features/nutrition/services/actions'
 import { ClientPortalView } from '@/features/client/components/client-portal-view'
 
 export async function ClientPortal() {
-  const [profile, plan, messages, availableSlots, mySessions, isDemo] = await Promise.all([
+  const [profile, plan, messages, availableSlots, mySessions, nutritionPlan, isDemo] = await Promise.all([
     getMyProfile(),
     getMyPlan(),
     listMyMessages(),
     listAvailableSlots(),
     listMySessions(),
+    getMyNutritionPlan(),
     isDemoClientSession(),
   ])
 
@@ -25,6 +27,7 @@ export async function ClientPortal() {
       initialMessages={messages}
       availableSlots={availableSlots}
       mySessions={mySessions}
+      nutritionPlan={nutritionPlan}
       isDemo={isDemo}
     />
   )

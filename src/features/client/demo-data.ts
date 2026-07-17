@@ -66,12 +66,6 @@ export const DEMO_HABITS = [
   { id: 'water', label: '2,5 L de agua', detail: 'Hidratación' },
 ] as const
 
-export const DEMO_MEALS = [
-  { name: 'Desayuno', content: 'Yogur griego, avena, frutos rojos y nueces', macros: '520 kcal · 38P / 58C / 16G' },
-  { name: 'Comida', content: 'Arroz, pollo, verduras y aceite de oliva', macros: '710 kcal · 52P / 82C / 18G' },
-  { name: 'Cena', content: 'Salmón, patata cocida y ensalada grande', macros: '640 kcal · 46P / 50C / 24G' },
-] as const
-
 export function getDemoAvailableSlots(): AvailableSlot[] {
   const now = new Date()
   const slots: AvailableSlot[] = []

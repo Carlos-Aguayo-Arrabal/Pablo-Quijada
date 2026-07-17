@@ -5,10 +5,7 @@ import Link from 'next/link'
 import {
   ArrowRight,
   CheckCircle2,
-  Droplets,
   Dumbbell,
-  Flame,
-  Footprints,
   LayoutGrid,
   BadgeEuro,
   MessageSquare,
@@ -27,6 +24,8 @@ import type { WellnessCheck } from '@/features/wellness/data'
 import type { AiSummary } from '@/features/ai-summary/data'
 import { AiSummaryCard } from '@/features/ai-summary/components/ai-summary-card'
 import { ClientBioCard } from '@/features/clients/components/client-bio-card'
+import { NutritionTab } from '@/features/nutrition/components/nutrition-tab'
+import type { NutritionPlanView } from '@/features/nutrition/services/actions'
 
 type ClientTab = 'Resumen' | 'Entrenamiento' | 'Nutrición' | 'Progreso' | 'Pagos' | 'Mensajes'
 
@@ -51,13 +50,6 @@ const workoutStatusTone: Record<string, string> = {
   Programado: 'border-white/15 bg-white/[0.05] text-[#94A3B8]',
 }
 
-const nutritionItems = [
-  { icon: Flame, label: 'Calorías objetivo', value: '2.150 kcal', note: 'Promedio semanal' },
-  { icon: Dumbbell, label: 'Proteína', value: '150 g', note: 'Objetivo diario' },
-  { icon: Footprints, label: 'Pasos', value: '8.000', note: 'Mínimo diario' },
-  { icon: Droplets, label: 'Agua', value: '2,5 L', note: 'Hidratación' },
-]
-
 const messages = [
   { from: 'Cliente', text: 'Hoy me noto bien, ¿subo un poco el peso en press?', time: 'Hace 2 h' },
   { from: 'Coach', text: 'Sí, sube 2 kg si mantienes técnica y no aparece molestia.', time: 'Hace 1 h' },
@@ -76,9 +68,10 @@ interface ClientProfileTabsProps {
   tests: PerformanceTest[]
   wellnessHistory: WellnessCheck[]
   aiSummary: AiSummary | null
+  nutritionPlan: NutritionPlanView | null
 }
 
-export function ClientProfileTabs({ client, payments, tests, wellnessHistory, aiSummary }: ClientProfileTabsProps) {
+export function ClientProfileTabs({ client, payments, tests, wellnessHistory, aiSummary, nutritionPlan }: ClientProfileTabsProps) {
   const [activeTab, setActiveTab] = useState<ClientTab>('Resumen')
 
   return (
@@ -182,30 +175,7 @@ export function ClientProfileTabs({ client, payments, tests, wellnessHistory, ai
       )}
 
       {activeTab === 'Nutrición' && (
-        <section className="glass-card rounded-2xl p-5">
-          <div className="mb-5 flex items-center justify-between">
-            <div>
-              <h2 className="text-sm font-bold text-white">Objetivos nutricionales</h2>
-              <p className="text-xs text-[#94A3B8]">Seguimiento diario conectado al check-in.</p>
-            </div>
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FFB000]/10 text-[#FFB000]">
-              <Utensils className="h-4 w-4" />
-            </span>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {nutritionItems.map((item) => (
-              <div key={item.label} className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
-                <item.icon className="mb-2 h-4 w-4 text-[#FFB000]" />
-                <p className="text-xs text-[#475569]">{item.label}</p>
-                <p className="mt-1 text-2xl font-black text-white">{item.value}</p>
-                <p className="mt-1 text-xs text-[#94A3B8]">{item.note}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 rounded-xl border border-[#FFB000]/20 bg-[#FFB000]/10 p-4 text-sm text-[#C8D2E3]">
-            Prioridad: mantener proteína alta y simplificar cenas los días de entrenamiento.
-          </div>
-        </section>
+        <NutritionTab clienteId={client.id} plan={nutritionPlan} />
       )}
 
       {activeTab === 'Progreso' && (

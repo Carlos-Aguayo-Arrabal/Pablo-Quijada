@@ -17,6 +17,7 @@ import { listPaymentsByClient } from '@/features/payments/services/actions'
 import { listPerformanceTests } from '@/features/performance-tests/services/actions'
 import { listWellnessHistory } from '@/features/wellness/services/actions'
 import { getLatestSummary } from '@/features/ai-summary/services/actions'
+import { getClientNutritionPlan } from '@/features/nutrition/services/actions'
 import { cn } from '@/shared/lib/utils'
 
 export const metadata: Metadata = {
@@ -29,12 +30,13 @@ export default async function ClientDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const [client, payments, tests, wellnessHistory, aiSummary] = await Promise.all([
+  const [client, payments, tests, wellnessHistory, aiSummary, nutritionPlan] = await Promise.all([
     getClientById(id),
     listPaymentsByClient(id),
     listPerformanceTests(id),
     listWellnessHistory(id),
     getLatestSummary(id),
+    getClientNutritionPlan(id),
   ])
   if (!client) notFound()
 
@@ -123,6 +125,7 @@ export default async function ClientDetailPage({
         tests={tests}
         wellnessHistory={wellnessHistory}
         aiSummary={aiSummary}
+        nutritionPlan={nutritionPlan}
       />
     </div>
   )

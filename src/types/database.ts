@@ -332,6 +332,30 @@ export type RecursosAyuda = {
   actualizado_en: string
 }
 
+export type PlanNutricional = {
+  id: string
+  entrenador_id: string
+  cliente_id: string
+  nombre: string
+  calorias_objetivo: number | null
+  proteina_objetivo_g: number | null
+  notas: string | null
+  creado_en: string
+  actualizado_en: string
+}
+
+export type ComidaNutricional = {
+  id: string
+  plan_id: string
+  nombre: string
+  orden: number
+  descripcion: string | null
+  calorias: number | null
+  proteina_g: number | null
+  imagen_url: string | null
+  creado_en: string
+}
+
 export type Program = Programa
 export type Phase = FasePrograma
 export type Week = SemanaPrograma
@@ -610,6 +634,34 @@ export interface Database {
         Insert: Partial<Omit<RecursosAyuda, 'id'>>
         Update: Partial<Omit<RecursosAyuda, 'id'>>
         Relationships: []
+      }
+      planes_nutricionales: {
+        Row: PlanNutricional
+        Insert: Pick<PlanNutricional, 'entrenador_id' | 'cliente_id'> &
+          Partial<Omit<PlanNutricional, 'id' | 'entrenador_id' | 'cliente_id' | 'creado_en' | 'actualizado_en'>>
+        Update: Partial<Omit<PlanNutricional, 'id' | 'creado_en' | 'actualizado_en'>>
+        Relationships: [
+          {
+            foreignKeyName: 'planes_nutricionales_cliente_id_fkey'
+            columns: ['cliente_id']
+            referencedRelation: 'clientes'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      comidas_nutricionales: {
+        Row: ComidaNutricional
+        Insert: Pick<ComidaNutricional, 'plan_id' | 'nombre'> &
+          Partial<Omit<ComidaNutricional, 'id' | 'plan_id' | 'nombre' | 'creado_en'>>
+        Update: Partial<Omit<ComidaNutricional, 'id' | 'plan_id' | 'creado_en'>>
+        Relationships: [
+          {
+            foreignKeyName: 'comidas_nutricionales_plan_id_fkey'
+            columns: ['plan_id']
+            referencedRelation: 'planes_nutricionales'
+            referencedColumns: ['id']
+          },
+        ]
       }
     }
     Views: Record<string, never>
