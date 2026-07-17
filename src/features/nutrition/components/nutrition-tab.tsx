@@ -1,11 +1,14 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
-import { ImagePlus, Loader2, Plus, Trash2, Utensils } from 'lucide-react'
+import { ImagePlus, Loader2, Plus, Search, Sparkles, Trash2, Upload, Utensils } from 'lucide-react'
 import {
   createMeal,
   createNutritionPlan,
   deleteMeal,
+  generateMealImageAI,
+  generateNutritionPlanAI,
+  searchMealStockImage,
   updateMeal,
   updateNutritionPlanSettings,
   uploadMealImage,
@@ -37,20 +40,36 @@ export function NutritionTab({ clienteId, plan }: NutritionTabProps) {
           <h2 className="text-sm font-bold text-white">Plan nutricional</h2>
         </div>
         <p className="mb-4 text-sm text-[#94A3B8]">Todavía no has creado un plan nutricional para este cliente.</p>
-        <button
-          type="button"
-          disabled={isPending}
-          onClick={() =>
-            startTransition(async () => {
-              const result = await createNutritionPlan(clienteId)
-              if (result.error) flashStatus(result.error)
-            })
-          }
-          className="btn-primary px-4 py-2 text-xs disabled:opacity-60"
-        >
-          {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-          Crear plan nutricional
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={() =>
+              startTransition(async () => {
+                const result = await generateNutritionPlanAI(clienteId)
+                if (result.error) flashStatus(result.error)
+              })
+            }
+            className="btn-primary px-4 py-2 text-xs disabled:opacity-60"
+          >
+            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            Generar plan con IA
+          </button>
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={() =>
+              startTransition(async () => {
+                const result = await createNutritionPlan(clienteId)
+                if (result.error) flashStatus(result.error)
+              })
+            }
+            className="btn-secondary px-4 py-2 text-xs disabled:opacity-60"
+          >
+            <Plus className="h-4 w-4" />
+            Crear plan en blanco
+          </button>
+        </div>
         {statusMessage && (
           <p className="mt-3 rounded-xl border border-[#F87171]/30 bg-[#F87171]/10 px-3 py-2 text-xs text-[#F87171]">
             {statusMessage}
@@ -197,53 +216,114 @@ function MealCard({
   onError: (message: string) => void
 }) {
   const [isPending, startTransition] = useTransition()
-  const [isUploading, setIsUploading] = useState(false)
+  const [imageAction, setImageAction] = useState<'upload' | 'stock' | 'ai' | null>(null)
+  const [showImageMenu, setShowImageMenu] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const isBusyWithImage = imageAction !== null
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
     event.target.value = ''
     if (!file) return
 
-    setIsUploading(true)
+    setImageAction('upload')
+    setShowImageMenu(false)
     const formData = new FormData()
     formData.append('imagen', file)
 
     startTransition(async () => {
       const result = await uploadMealImage(clienteId, meal.id, formData)
       if (result.error) onError(result.error)
-      setIsUploading(false)
+      setImageAction(null)
+    })
+  }
+
+  function handleStockSearch() {
+    setImageAction('stock')
+    setShowImageMenu(false)
+    startTransition(async () => {
+      const result = await searchMealStockImage(clienteId, meal.id, meal.nombre)
+      if (result.error) onError(result.error)
+      setImageAction(null)
+    })
+  }
+
+  function handleAiGenerate() {
+    setImageAction('ai')
+    setShowImageMenu(false)
+    startTransition(async () => {
+      const result = await generateMealImageAI(clienteId, meal.id, meal.nombre, meal.descripcion)
+      if (result.error) onError(result.error)
+      setImageAction(null)
     })
   }
 
   return (
     <div className="overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.03]">
-      <button
-        type="button"
-        onClick={() => fileInputRef.current?.click()}
-        disabled={isUploading}
-        className="group relative block h-32 w-full overflow-hidden bg-white/[0.03]"
-      >
+      <div className="relative h-32 w-full overflow-hidden bg-white/[0.03]">
         {meal.imagenUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- imagen de storage, sin optimizacion de next/image en este proyecto
-          <img src={meal.imagenUrl} alt={meal.nombre} className="h-full w-full object-cover transition group-hover:opacity-70" />
+          <img src={meal.imagenUrl} alt={meal.nombre} className="h-full w-full object-cover" />
         ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-[#475569] transition group-hover:text-brand">
+          <button
+            type="button"
+            onClick={() => setShowImageMenu((value) => !value)}
+            disabled={isBusyWithImage}
+            className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-[#475569] transition hover:text-brand"
+          >
             <ImagePlus className="h-6 w-6" />
             <span className="text-[11px] font-semibold">Añadir foto</span>
-          </div>
+          </button>
         )}
-        {isUploading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-[#080C14]/70">
+
+        {isBusyWithImage && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-[#080C14]/80">
             <Loader2 className="h-5 w-5 animate-spin text-brand" />
+            <span className="text-[11px] font-semibold text-white">
+              {imageAction === 'ai' ? 'Generando con IA...' : imageAction === 'stock' ? 'Buscando foto...' : 'Subiendo...'}
+            </span>
           </div>
         )}
-        {meal.imagenUrl && !isUploading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-[#080C14]/0 opacity-0 transition group-hover:bg-[#080C14]/50 group-hover:opacity-100">
+
+        {meal.imagenUrl && !isBusyWithImage && (
+          <button
+            type="button"
+            onClick={() => setShowImageMenu((value) => !value)}
+            className="absolute inset-0 flex items-center justify-center bg-[#080C14]/0 opacity-0 transition hover:bg-[#080C14]/50 hover:opacity-100"
+          >
             <span className="text-[11px] font-semibold text-white">Cambiar foto</span>
+          </button>
+        )}
+
+        {showImageMenu && !isBusyWithImage && (
+          <div className="absolute inset-0 flex flex-col justify-center gap-1.5 bg-[#080C14]/90 p-3">
+            <button
+              type="button"
+              onClick={handleStockSearch}
+              className="flex items-center gap-2 rounded-lg bg-white/[0.06] px-2.5 py-2 text-left text-[11px] font-semibold text-white hover:bg-white/[0.1]"
+            >
+              <Search className="h-3.5 w-3.5 shrink-0 text-brand" />
+              Buscar foto libre (gratis)
+            </button>
+            <button
+              type="button"
+              onClick={handleAiGenerate}
+              className="flex items-center gap-2 rounded-lg bg-white/[0.06] px-2.5 py-2 text-left text-[11px] font-semibold text-white hover:bg-white/[0.1]"
+            >
+              <Sparkles className="h-3.5 w-3.5 shrink-0 text-brand" />
+              Generar con IA
+            </button>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-2 rounded-lg bg-white/[0.06] px-2.5 py-2 text-left text-[11px] font-semibold text-white hover:bg-white/[0.1]"
+            >
+              <Upload className="h-3.5 w-3.5 shrink-0 text-brand" />
+              Subir mi foto
+            </button>
           </div>
         )}
-      </button>
+      </div>
       <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
 
       <div className="p-3">

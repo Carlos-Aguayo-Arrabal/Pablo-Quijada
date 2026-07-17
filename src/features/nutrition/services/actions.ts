@@ -1,9 +1,11 @@
 'use server'
 
 import { z } from 'zod'
+import { generateObject, generateImage } from 'ai'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { isDemoClientSession, isDemoSession } from '@/features/demo/server'
+import { getOpenAI, MODELS } from '@/lib/ai/openai'
 
 export interface NutritionMealView {
   id: string
@@ -260,4 +262,207 @@ export async function uploadMealImage(clienteId: string, mealId: string, formDat
 
   revalidatePath(`/dashboard/clients/${clienteId}`)
   return { success: true, url: publicUrlData.publicUrl }
+}
+
+// Sube unos bytes ya obtenidos (banco de imágenes o IA) al mismo bucket y con
+// la misma convención de ruta que uploadMealImage, evitando enlazar directo a
+// una URL externa que puede caducar o desaparecer.
+async function storeMealImageBytes(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  entrenadorId: string,
+  clienteId: string,
+  mealId: string,
+  bytes: Uint8Array,
+  contentType: string,
+  extension: string
+) {
+  const path = `${entrenadorId}/${mealId}-${Date.now()}.${extension}`
+  const { error: uploadError } = await supabase.storage
+    .from('nutrition-images')
+    .upload(path, bytes, { upsert: true, contentType })
+  if (uploadError) return { error: uploadError.message }
+
+  const { data: publicUrlData } = supabase.storage.from('nutrition-images').getPublicUrl(path)
+
+  const { error: updateError } = await supabase
+    .from('comidas_nutricionales')
+    .update({ imagen_url: publicUrlData.publicUrl })
+    .eq('id', mealId)
+  if (updateError) return { error: updateError.message }
+
+  revalidatePath(`/dashboard/clients/${clienteId}`)
+  return { success: true as const, url: publicUrlData.publicUrl }
+}
+
+// Opción gratuita y por defecto: busca una foto de dominio público (CC0) en
+// Openverse (openverse.org, API pública sin necesidad de clave) a partir del
+// nombre de la comida. Sin coste, sin claves nuevas que configurar.
+export async function searchMealStockImage(clienteId: string, mealId: string, query: string) {
+  if (await isDemoSession()) return { error: 'No disponible en la sesión de demostración.' }
+  if (!query.trim()) return { error: 'Escribe primero el nombre de la comida.' }
+
+  const supabase = await createClient()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  if (userError || !user) return { error: 'No autenticado.' }
+
+  const searchUrl = `https://api.openverse.org/v1/images/?${new URLSearchParams({
+    q: `${query} food plate`,
+    license: 'cc0,pdm',
+    category: 'photograph',
+    page_size: '1',
+  })}`
+
+  let candidateUrl: string
+  try {
+    const searchResponse = await fetch(searchUrl, { headers: { 'User-Agent': 'TrainTools/1.0' } })
+    if (!searchResponse.ok) return { error: 'No se pudo buscar la imagen. Inténtalo de nuevo.' }
+    const searchData = await searchResponse.json() as { results?: { url?: string }[] }
+    const first = searchData.results?.[0]?.url
+    if (!first) return { error: 'No se encontró ninguna foto libre para esta comida.' }
+    candidateUrl = first
+  } catch {
+    return { error: 'No se pudo buscar la imagen. Inténtalo de nuevo.' }
+  }
+
+  try {
+    const imageResponse = await fetch(candidateUrl)
+    if (!imageResponse.ok) return { error: 'No se pudo descargar la imagen encontrada.' }
+    const contentType = imageResponse.headers.get('content-type') ?? 'image/jpeg'
+    const extension = contentType.includes('png') ? 'png' : contentType.includes('webp') ? 'webp' : 'jpg'
+    const bytes = new Uint8Array(await imageResponse.arrayBuffer())
+    return await storeMealImageBytes(supabase, user.id, clienteId, mealId, bytes, contentType, extension)
+  } catch {
+    return { error: 'No se pudo descargar la imagen encontrada.' }
+  }
+}
+
+// Genera una foto realista con IA (gpt-image-1, usa la OPENAI_API_KEY ya
+// configurada en el proyecto). Tiene coste por imagen y tarda unos segundos.
+export async function generateMealImageAI(clienteId: string, mealId: string, mealName: string, mealDescription: string | null) {
+  if (await isDemoSession()) return { error: 'No disponible en la sesión de demostración.' }
+
+  const supabase = await createClient()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  if (userError || !user) return { error: 'No autenticado.' }
+
+  const prompt = `Fotografía de comida profesional y realista de "${mealName}"${mealDescription ? `: ${mealDescription}` : ''}. Vista cenital, luz natural, plato apetitoso, fondo neutro de cocina. Sin texto ni marcas de agua.`
+
+  try {
+    const { image } = await generateImage({
+      model: getOpenAI().image('gpt-image-1'),
+      prompt,
+      size: '1024x1024',
+    })
+    return await storeMealImageBytes(supabase, user.id, clienteId, mealId, image.uint8Array, image.mediaType ?? 'image/png', 'png')
+  } catch {
+    return { error: 'No se pudo generar la imagen con IA. Inténtalo de nuevo en unos minutos.' }
+  }
+}
+
+const aiPlanSchema = z.object({
+  nombre: z.string().describe('Nombre corto del plan, ej. "Plan nutricional — déficit moderado"'),
+  caloriasObjetivo: z.number().int().describe('Calorías diarias objetivo, coherentes con el objetivo del cliente'),
+  proteinaObjetivoG: z.number().int().describe('Gramos de proteína diarios objetivo'),
+  notas: z.string().describe('Una frase con la prioridad nutricional principal para este cliente'),
+  meals: z.array(z.object({
+    nombre: z.string().describe('Ej: Desayuno, Comida, Cena, Snack'),
+    descripcion: z.string().describe('Ingredientes principales, breve'),
+    calorias: z.number().int(),
+    proteinaG: z.number().int(),
+  })).describe('Entre 3 y 5 comidas que sumen aproximadamente las calorías objetivo'),
+})
+
+// Genera un plan completo (objetivos + comidas) con IA a partir del objetivo,
+// nivel y datos biométricos ya registrados del cliente. Crea el plan si no
+// existía todavía.
+export async function generateNutritionPlanAI(clienteId: string) {
+  if (await isDemoSession()) return { error: 'No disponible en la sesión de demostración.' }
+
+  const supabase = await createClient()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  if (userError || !user) return { error: 'No autenticado.' }
+
+  const { data: cliente } = await supabase
+    .from('clientes')
+    .select('nombre, objetivo, nivel, peso, altura, edad, lesiones')
+    .eq('id', clienteId)
+    .single()
+  if (!cliente) return { error: 'Cliente no encontrado.' }
+
+  const prompt = `Eres un nutricionista deportivo. Diseña un plan nutricional diario para este cliente.
+
+Cliente: ${cliente.nombre}
+Objetivo: ${cliente.objetivo ?? 'sin especificar'}
+Nivel de entrenamiento: ${cliente.nivel ?? 'sin especificar'}
+Peso: ${cliente.peso ?? 'sin especificar'}
+Altura: ${cliente.altura ? `${cliente.altura} cm` : 'sin especificar'}
+Edad: ${cliente.edad ?? 'sin especificar'}
+Lesiones o patologías a tener en cuenta: ${cliente.lesiones || 'ninguna registrada'}
+
+Si faltan datos, usa valores razonables para un adulto activo. Genera entre 3 y 5 comidas (Desayuno, Comida, Cena y opcionalmente Snacks) cuyas calorías sumen aproximadamente el objetivo diario. Responde siempre en español.`
+
+  let plan: z.infer<typeof aiPlanSchema>
+  try {
+    const result = await generateObject({
+      model: getOpenAI()(MODELS.balanced),
+      schema: aiPlanSchema,
+      prompt,
+      maxOutputTokens: 1500,
+    })
+    plan = result.object
+  } catch {
+    return { error: 'No se pudo generar el plan con IA. Inténtalo de nuevo en unos minutos.' }
+  }
+
+  const { data: existingPlan } = await supabase
+    .from('planes_nutricionales')
+    .select('id')
+    .eq('cliente_id', clienteId)
+    .maybeSingle()
+
+  let planId = existingPlan?.id
+  if (planId) {
+    const { error } = await supabase
+      .from('planes_nutricionales')
+      .update({
+        nombre: plan.nombre,
+        calorias_objetivo: plan.caloriasObjetivo,
+        proteina_objetivo_g: plan.proteinaObjetivoG,
+        notas: plan.notas,
+      })
+      .eq('id', planId)
+    if (error) return { error: error.message }
+  } else {
+    const { data: inserted, error } = await supabase
+      .from('planes_nutricionales')
+      .insert({
+        entrenador_id: user.id,
+        cliente_id: clienteId,
+        nombre: plan.nombre,
+        calorias_objetivo: plan.caloriasObjetivo,
+        proteina_objetivo_g: plan.proteinaObjetivoG,
+        notas: plan.notas,
+      })
+      .select('id')
+      .single()
+    if (error || !inserted) return { error: error?.message ?? 'No se pudo crear el plan.' }
+    planId = inserted.id
+  }
+
+  const { error: mealsError } = await supabase
+    .from('comidas_nutricionales')
+    .insert(
+      plan.meals.map((meal, index) => ({
+        plan_id: planId,
+        nombre: meal.nombre,
+        orden: index,
+        descripcion: meal.descripcion,
+        calorias: meal.calorias,
+        proteina_g: meal.proteinaG,
+      }))
+    )
+  if (mealsError) return { error: mealsError.message }
+
+  revalidatePath(`/dashboard/clients/${clienteId}`)
+  return { success: true }
 }
